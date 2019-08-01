@@ -28,7 +28,7 @@ git clone https://github.com/up42/modis.git <directory>
 
 then do `cd <directory>`.
 
-#### Install the required libraries
+### Installing the required libraries
 
 First create a virtual environment either by using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) 
 or [virtualenv](https://virtualenv.pypa.io/en/latest/).
