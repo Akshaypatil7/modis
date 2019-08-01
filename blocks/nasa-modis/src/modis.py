@@ -1,10 +1,23 @@
 import uuid
 
-from gibs import GibsAPI
+import mercantile
+from shapely.geometry import box
+from geojson import FeatureCollection, Feature
+import requests
+
+from blockutils.common import (load_query, save_metadata, ensure_data_directories_exist,
+                               BlockModes, get_block_mode, save_usage_report)
+from blockutils.fetcher import AbstractFetcher, AbstractAOIClippedFetcher, AbstractFullSceneFetcher
+from blockutils.logging import get_logger
+from blockutils.stac import STACQuery
+from blockutils.geometry import filter_tiles_intersect_with_geometry
 
 from blockutils.stac import STACQuery
 from blockutils.logging import get_logger
 from blockutils.fetcher import AbstractFetcher
+from blockutils.common import ensure_data_directories_exist
+
+from gibs import GibsAPI
 
 logger = get_logger(__name__)
 
@@ -29,6 +42,8 @@ class Modis:
 
         def fetch(self, query: STACQuery, dry_run: bool = False) -> FeatureCollection:
 
+            # We take whatever geometry we get and then fetch the corresponding tiles for one year per limit
+
             # Get the list of tiles that cover the bbox. Sorted by (y, x) in ascending order
             bbox_tile_list = list(filter_tiles_intersect_with_geometry( \
                 tiles=mercantile.tiles(*query_bbox, zooms=query.zoom_level, truncate=True),
@@ -36,12 +51,15 @@ class Modis:
 
             ensure_data_directories_exist()
 
-            logger.debug("Search gave %s results", len(oa_features))
 
             output_features: List[Feature] = []
 
-            for oa_feature in oa_features:
+            for idx in query.limit:
                 feature_id: str = str(uuid.uuid4())
+
+                # Fetch tiles and patch them together
+
+                feature = Feature()
 
                 if not dry_run:
                     set_capability(feature, AOICLIPPED, "%s.tif" % feature_id)
