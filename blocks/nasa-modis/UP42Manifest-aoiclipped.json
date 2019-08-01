@@ -4,13 +4,13 @@
     "type": "data",
     "tags": [
       "NASA",
-      "Gibs",
+      "GIBS",
       "MODIS",
       "optical",
       "global"
     ],
     "display_name": "MODIS AOI-Clipped",
-    "description": "MODIS optical data with daily revisit rate.",
+    "description": "MODIS optical data with daily revisit rate fetched using Global Imagery Browse Services (GIBS).",
     "parameters": {
       "bbox": {"type": "array", "default": null},
       "intersects": {"type": "geometry"},

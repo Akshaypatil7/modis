@@ -5,7 +5,6 @@ from decimal import Decimal
 from typing import Union, Tuple, Iterable, cast, Optional, Callable
 
 import shapely.geometry
-
 from geojson.geometry import Geometry
 import ciso8601
 
