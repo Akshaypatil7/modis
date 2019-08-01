@@ -1,7 +1,7 @@
 # MODIS data block for UP42
 ## Introduction
 
-This is an example data block based on NASA's Global Imagery Browse Services (GIBS) providing access to three-band
+This is an example data block based on NASA's [Global Imagery Browse Services (GIBS)](https://earthdata.nasa.gov/eosdis/science-system-description/eosdis-components/gibs) providing access to three-band
 MODIS imagery.
 
 ## Block description
@@ -15,8 +15,6 @@ MODIS imagery.
  2. [docker engine](https://docs.docker.com/engine/).
  3. [UP42](https://up42.com) account credentials.
  4. [Python](https://python.org) 3.5 or later.
- 5. Required Python packages as specified in
-    `blocks/s2-superresolution/requirements.txt`.
 
 ## Usage
 
