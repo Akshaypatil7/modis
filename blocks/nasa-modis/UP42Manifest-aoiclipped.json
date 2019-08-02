@@ -1,0 +1,34 @@
+{
+    "_up42_specification_version": 1,
+    "name": "modis-aoiclipped",
+    "type": "data",
+    "tags": [
+      "NASA",
+      "GIBS",
+      "MODIS",
+      "optical",
+      "global"
+    ],
+    "display_name": "MODIS AOI-Clipped",
+    "description": "MODIS optical data with daily revisit rate fetched using Global Imagery Browse Services (GIBS).",
+    "parameters": {
+      "bbox": {"type": "array", "default": null},
+      "intersects": {"type": "geometry"},
+      "contains": {"type": "geometry"},
+      "time": {"type": "dateRange", "default": null},
+      "limit": {"type": "integer", "minimum": 1, "default": 1},
+      "zoom_level": {"type": "number", "default": 9}
+    },
+    "machine": {
+      "type": "medium"
+    },
+    "optional_features": {
+      "quicklook_supported": false,
+      "dry_run_supported": false
+    },
+    "input_capabilities": {
+    },
+    "output_capabilities": {
+        "up42.data.aoiclipped": {}
+    }
+  }
