@@ -5,17 +5,13 @@ from shapely.geometry import box
 from geojson import FeatureCollection, Feature
 import requests
 
-from blockutils.common import (load_query, save_metadata, ensure_data_directories_exist,
-                               BlockModes, get_block_mode, save_usage_report)
-from blockutils.fetcher import AbstractFetcher, AbstractAOIClippedFetcher, AbstractFullSceneFetcher
-from blockutils.logging import get_logger
-from blockutils.stac import STACQuery
 from blockutils.geometry import filter_tiles_intersect_with_geometry
-
 from blockutils.stac import STACQuery
 from blockutils.logging import get_logger
-from blockutils.fetcher import AbstractFetcher
-from blockutils.common import ensure_data_directories_exist
+from blockutils.fetcher import AbstractFetcher, AbstractAOIClippedFetcher
+from blockutils.common import (load_query, save_metadata, ensure_data_directories_exist,
+                               BlockModes, get_block_mode)
+
 
 from gibs import GibsAPI
 
@@ -34,8 +30,6 @@ class Modis:
         logger.debug("Saving %s result features", len(result.get("features")))
         save_metadata(result)
 
-
-    # Fetcher helper classes
     class AOIClippedFetcher(AbstractAOIClippedFetcher):
         def __init__(self):
             self.api = GibsAPI()
@@ -48,6 +42,11 @@ class Modis:
             bbox_tile_list = list(filter_tiles_intersect_with_geometry( \
                 tiles=mercantile.tiles(*query_bbox, zooms=query.zoom_level, truncate=True),
                 geometry=query.geometry()))
+
+            # Filter list by actual geometry
+            feature_tile_list = list(filter_tiles_intersect_with_geometry(
+                tiles=bbox_tile_list,
+                geometry=query.geometry()
 
             ensure_data_directories_exist()
 
