@@ -1,10 +1,12 @@
-import io
-import uuid
+from io import BytesIO
+import tempfile
 from pathlib import Path
 
 import requests
 from mercantile import Tile
-import rasterio
+import rasterio as rio
+
+from rasterio.merge import merge
 
 from blockutils.logging import get_logger
 
@@ -34,11 +36,9 @@ class GibsAPI:
 
         return wmts_response.content
 
-
-    def get_merged_image(self, tiles: list, date: str, output_uuid: str, layer: str, wmts_endpoint: str) -> Path:
-        # pylint: disable=too-many-locals
+    def get_merged_image(self, tiles: list, date: str, output_uuid: str) -> Path:
         """
-        Fetches all tiles for one date, merges them and returns a GeoTIFF as well as the bounds of the actual data
+        Fetches all tiles for one date, merges them and returns a GeoTIFF
         """
 
         def copy_filelike_to_filelike(src, dst, bufsize=16384):
@@ -48,17 +48,19 @@ class GibsAPI:
                     break
                 dst.write(buf)
 
-        img_files = []
-
         logger.info("Downloading tiles")
 
+        img_files = []
+
         for tile in tiles:
-            img_buffer = BytesIO(self.wmts_download_tile(tile, date, layer, wmts_endpoint))
-            tmpfile = tempfile.NamedTemporaryFile()
-            with open(tmpfile.name, "wb") as outfile:
+            img_buffer = BytesIO(self.get_wmts_tile(date, tile))
+            tmp_file = tempfile.NamedTemporaryFile()
+            with open(tmp_file.name, "wb") as outfile:
                 copy_filelike_to_filelike(img_buffer, outfile)
 
-            img_files.append(rasterio.open(tmpfile.name))
+            img_files.append(rio.open(tmp_file.name))
+
+        logger.info("Merging tiles into one GeoTIFF file")
 
         out_ar, out_trans = merge(img_files)
 
@@ -71,7 +73,7 @@ class GibsAPI:
             "width": out_ar.shape[2],
         })
 
-        with rasterio.open(img_filename, "w", **merged_img_meta) as dataset:
+        with rio.open(img_filename, "w", **merged_img_meta) as dataset:
             dataset.write(out_ar)
 
         return Path(img_filename)
