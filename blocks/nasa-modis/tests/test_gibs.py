@@ -5,12 +5,12 @@ import requests_mock as mock
 
 
 def test_write_quicklook():
-    pass
+    assert 1 == 0
 
 
 def test_get_wmts_tile():
-    pass
+    assert 1 == 0
 
 
-def merge_tiles():
-    pass
+def test_merge_tiles():
+    assert 1 == 0
