@@ -1,9 +1,8 @@
 import uuid
 
-import mercantile
-from shapely.geometry import box
+
 from geojson import FeatureCollection, Feature
-import requests
+import mercantile
 
 from blockutils.geometry import filter_tiles_intersect_with_geometry
 from blockutils.stac import STACQuery
@@ -46,7 +45,7 @@ class Modis:
             # Filter list by actual geometry
             feature_tile_list = list(filter_tiles_intersect_with_geometry(
                 tiles=bbox_tile_list,
-                geometry=query.geometry()
+                geometry=query.geometry()))
 
             ensure_data_directories_exist()
 
@@ -66,5 +65,5 @@ class Modis:
             logger.debug(feature)
             output_features.append(feature)
 
-        return FeatureCollection(list(output_features))
+            return FeatureCollection(list(output_features))
 
