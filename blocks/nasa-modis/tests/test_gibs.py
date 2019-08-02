@@ -7,13 +7,14 @@ import requests_mock as mock
 from context import GibsAPI
 
 
-def test_write_quicklook():
-    assert 1 == 0
-
 
 def test_get_wmts_tile():
-    assert 1 == 0
+    img_path = GibsAPI().get_wmts_tile(test_tile)
 
 
 def test_merge_tiles():
     assert 1 == 0
+
+def test_write_quicklook():
+    assert 1 == 0
+

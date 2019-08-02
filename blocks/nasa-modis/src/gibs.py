@@ -39,8 +39,8 @@ class GibsAPI:
             meta = image.meta
 
         tile_transform = rasterio.transform.from_bounds(*mercantile.xy_bounds(tile),
-                                                        width=meta_pansharpened.get("width"),
-                                                        height=meta_pansharpened.get("height"))
+                                                        width=meta.get("width"),
+                                                        height=meta.get("height"))
 
         # Amending metadata of panchromatic tile
         meta.update(driver="GTiff", crs="EPSG:3857", transform=tile_transform)
