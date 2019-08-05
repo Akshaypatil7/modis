@@ -3,8 +3,9 @@ import tempfile
 from pathlib import Path
 
 import requests
-from mercantile import Tile
+import mercantile
 import rasterio as rio
+from rasterio.merge import merge
 
 from rasterio.merge import merge
 
@@ -24,7 +25,7 @@ class GibsAPI:
                              "/GoogleMapsCompatible_Level9/{zoom}/{x}/{y}.jpg"
         self.quicklook_size = 512, 512
 
-    def get_wmts_tile(self, date: str, tile: Tile):
+    def download_wmts_tile_as_geotiff(self, date: str, tile: mercantile.Tile) -> BytesIO:
         tile_url = self.wmts_url + self.wmts_endpoint.format(date=date, x=tile.x, y=tile.y, zoom=tile.z)
 
         logger.debug(tile_url)
@@ -34,37 +35,43 @@ class GibsAPI:
         if wmts_response.status_code != 200:
             raise requests.RequestException
 
-        return wmts_response.content
+        img: rio.MemoryFile = BytesIO(wmts_response.content)
+
+        bands = []
+        with rio.open(img, driver='JPEG') as image:
+            for i in range(image.count):
+                bands.append(image.read(i + 1))
+            tile_meta = image.meta
+
+        tile_transform = rio.transform.from_bounds(*mercantile.xy_bounds(tile),
+                                                   width=tile_meta.get("width"),
+                                                   height=tile_meta.get("height"))
+
+        tile_meta.update(driver="GTiff", crs="EPSG:3857", transform=tile_transform)
+
+        tmp_file = tempfile.NamedTemporaryFile()
+
+        with rio.open(tmp_file.name, 'w', **tile_meta) as output_tile:
+            for idx, band in enumerate(bands):
+                output_tile.write(band, idx + 1)
+
+        return tmp_file
+
 
     def get_merged_image(self, tiles: list, date: str, output_uuid: str) -> Path:
         """
         Fetches all tiles for one date, merges them and returns a GeoTIFF
         """
 
-        def copy_filelike_to_filelike(src, dst, bufsize=16384):
-            while True:
-                buf = src.read(bufsize)
-                if not buf:
-                    break
-                dst.write(buf)
-
+        tiff_file_list = []
         logger.info("Downloading tiles")
-
-        img_files = []
-
         for tile in tiles:
-            img_buffer = BytesIO(self.get_wmts_tile(date, tile))
-            tmp_file = tempfile.NamedTemporaryFile()
-            with open(tmp_file.name, "wb") as outfile:
-                copy_filelike_to_filelike(img_buffer, outfile)
+            tile_stream = self.download_wmts_tile(date, tile)
+            tiff_path = self.convert_jpeg_stream_to_geotiff_file(tile_stream, tile)
+            tiff_file_list.append(tiff_path)
 
-            img_files.append(rio.open(tmp_file.name))
-
-        logger.info("Merging tiles into one GeoTIFF file")
-
+        # Now merge the images
         out_ar, out_trans = merge(img_files)
-
-        img_filename = "/tmp/output/%s.tif" % output_uuid
 
         merged_img_meta = img_files[0].meta.copy()
         merged_img_meta.update({
@@ -72,6 +79,8 @@ class GibsAPI:
             "height": out_ar.shape[1],
             "width": out_ar.shape[2],
         })
+
+        img_filename = "/tmp/output/%s.tif" % str(output_uuid)
 
         with rio.open(img_filename, "w", **merged_img_meta) as dataset:
             dataset.write(out_ar)

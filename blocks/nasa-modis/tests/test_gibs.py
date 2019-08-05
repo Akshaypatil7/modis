@@ -1,4 +1,5 @@
 import os
+from io import BytesIO
 
 import mercantile
 import rasterio as rio
@@ -12,7 +13,7 @@ import requests_mock as mock
 from context import GibsAPI
 
 
-def test_get_wmts_tile(requests_mock):
+def test_download_wmts_tile_as_geotiff(requests_mock):
     _location_ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     test_tile = mercantile.Tile(x=290, y=300, z=9)
     test_date = '2019-06-20'
@@ -22,10 +23,23 @@ def test_get_wmts_tile(requests_mock):
 
     requests_mock.get(mock.ANY, content=fake_tile)
 
-    result = GibsAPI().get_wmts_tile(test_date, test_tile)
+    result = GibsAPI().download_wmts_tile_as_geotiff(test_date, test_tile)
 
-    assert isinstance(result, bytes)
-    assert result[:5] == b'\xff\xd8\xff\xe0\x00'
+    expected_meta = {
+        'driver': 'GTiff',
+        'dtype': 'uint8',
+        'nodata': None,
+        'width': 256,
+        'height': 256,
+        'count': 3,
+        'crs': CRS.from_dict(init='epsg:3857'),
+        'transform': Affine(305.74811314070394, 0.0, 2661231.5767766964,
+                            0.0, -305.7481131407094, -3443946.746416901)}
+
+    with rio.open(result) as dataset:
+        meta = dataset.meta
+
+    assert meta == expected_meta
 
 
 def test_get_merged_image():
