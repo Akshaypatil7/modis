@@ -63,13 +63,11 @@ class GibsAPI:
         Fetches all tiles for one date, merges them and returns a GeoTIFF
         """
 
-        tiff_file_list = []
+        img_files = []
         logger.info("Downloading tiles")
         for tile in tiles:
-            tile_stream = self.download_wmts_tile(date, tile)
-            tiff_path = self.convert_jpeg_stream_to_geotiff_file(tile_stream, tile)
-            tiff_file_list.append(tiff_path)
-
+            tiff_file = self.download_wmts_tile_as_geotiff(date, tile)
+            img_files.append(rio.open(tiff_file.name, driver="GTiff"))
         # Now merge the images
         out_ar, out_trans = merge(img_files)
 
@@ -84,6 +82,8 @@ class GibsAPI:
 
         with rio.open(img_filename, "w", **merged_img_meta) as dataset:
             dataset.write(out_ar)
+
+        # TODO don't forget cleanup
 
         return Path(img_filename)
 

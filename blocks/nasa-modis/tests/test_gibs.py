@@ -37,30 +37,26 @@ def test_download_wmts_tile_as_geotiff(requests_mock):
                             0.0, -305.7481131407094, -3443946.746416901)}
 
     with rio.open(result) as dataset:
-        meta = dataset.meta
-
-    assert meta == expected_meta
+        dataset.meta == expected_meta
 
 
 def test_get_merged_image():
     test_tiles = [mercantile.Tile(x=290, y=300, z=9), mercantile.Tile(x=290, y=301, z=9)]
 
-    test_date = '2019-04-21'
+    test_date = '2019-06-20'
 
     result_filename = GibsAPI().get_merged_image(test_tiles, test_date, "a8ebbe34-4d63-4eef-8ff4-c69da3ee359d")
 
-    import pdb; pdb.set_trace()
-
     expected_meta = {
         'driver': 'GTiff',
-        'dtype': 'uint16',
+        'dtype': 'uint8',
         'nodata': None,
         'width': 256,
         'height': 512,
-        'count': 12,
+        'count': 3,
         'crs': CRS.from_dict(init='epsg:3857'),
-        'transform': Affine(38.21851414258708, 0.0, 3717897.055790972,
-                            0.0, -38.21851414259436, 4618019.500877209)}
+        'transform': Affine(305.74811314070394, 0.0, 2661231.5767766964,
+                            0.0, -305.7481131407094, -3443946.746416901)}
 
     with rio.open(str(result_filename)) as dataset:
         assert dataset.meta == expected_meta
