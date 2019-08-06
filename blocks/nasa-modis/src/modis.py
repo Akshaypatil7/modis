@@ -35,24 +35,16 @@ class Modis:
 
         def fetch(self, query: STACQuery, dry_run: bool = False) -> FeatureCollection:
 
-            # We take whatever geometry we get and then fetch the corresponding tiles for one year per limit
-
-            # Get the list of tiles that cover the bbox. Sorted by (y, x) in ascending order
-            bbox_tile_list = list(filter_tiles_intersect_with_geometry( \
-                tiles=mercantile.tiles(*query_bbox, zooms=query.zoom_level, truncate=True),
-                geometry=query.geometry()))
-
-            # Filter list by actual geometry
-            feature_tile_list = list(filter_tiles_intersect_with_geometry(
-                tiles=bbox_tile_list,
-                geometry=query.geometry()))
-
             ensure_data_directories_exist()
 
+            # Get the list of tiles that cover the query AOI. Sorted by (y, x) in ascending order
+            bbox_tile_list = list(filter_tiles_intersect_with_geometry( \
+                tiles=mercantile.tiles(*query.bounds(), zooms=query.zoom_level, truncate=True),
+                geometry=query.geometry()))
 
             output_features: List[Feature] = []
 
-            for idx in query.limit:
+            for idx in range(query.limit):
                 feature_id: str = str(uuid.uuid4())
 
                 # Fetch tiles and patch them together

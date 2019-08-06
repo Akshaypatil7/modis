@@ -1,13 +1,10 @@
 import os
-from io import BytesIO
 
 import mercantile
 import rasterio as rio
 from rasterio.crs import CRS
 from rasterio.transform import Affine
 
-import numpy as np
-import pytest
 import requests_mock as mock
 
 from context import GibsAPI
