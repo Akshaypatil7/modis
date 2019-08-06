@@ -7,7 +7,76 @@ from rasterio.transform import Affine
 
 import requests_mock as mock
 
-from context import GibsAPI
+from context import GibsAPI, STACQuery
+
+
+def test_extract_query_dates():
+    """
+    time is always set, be default to 1. We therefore have the following cases to test:
+    (1) time is not set
+    (2) limit is set to a number smaller or equal than days are in the provided time period
+    (3) limit is set to a number larger than days are in the provided time period
+    (4) time is set to one point in time (not a period)
+    """
+
+    # case (1)
+    query = STACQuery.from_dict({
+        "zoom_level": 9,
+        "limit": 2,
+        "bbox": [
+            114.11227717995645,
+            -21.861101064554884,
+            114.20209027826787,
+            -21.764821237030162
+        ]
+    })
+
+    date_list = GibsAPI.extract_query_dates(query)
+
+    # case (1)
+    query = STACQuery.from_dict({
+        "zoom_level": 9,
+        "time": "2016-04-01T16:40:49+00:00/2019-04-25T16:41:49+00:00",
+        "limit": 2,
+        "bbox": [
+            114.11227717995645,
+            -21.861101064554884,
+            114.20209027826787,
+            -21.764821237030162
+        ]
+    })
+
+    date_list = GibsAPI.extract_query_dates(query)
+
+    # case (1)
+    query = STACQuery.from_dict({
+        "zoom_level": 9,
+        "time": "2016-04-01T16:40:49+00:00/2019-04-02T16:41:49+00:00",
+        "limit": 4,
+        "bbox": [
+            114.11227717995645,
+            -21.861101064554884,
+            114.20209027826787,
+            -21.764821237030162
+        ]
+    })
+
+    date_list = GibsAPI.extract_query_dates(query)
+
+    # case (1)
+    query = STACQuery.from_dict({
+        "zoom_level": 9,
+        "time": "2019-04-25T16:41:49+00:00",
+        "limit": 2,
+        "bbox": [
+            114.11227717995645,
+            -21.861101064554884,
+            114.20209027826787,
+            -21.764821237030162
+        ]
+    })
+
+    date_list = GibsAPI.extract_query_dates(query)
 
 
 def test_download_wmts_tile_as_geotiff(requests_mock):

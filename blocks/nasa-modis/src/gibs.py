@@ -5,11 +5,11 @@ from pathlib import Path
 import requests
 import mercantile
 import rasterio as rio
-from rasterio.merge import merge
 
 from rasterio.merge import merge
 
 from blockutils.logging import get_logger
+from blockutils.stac import STACQuery
 
 logger = get_logger(__name__)
 
@@ -24,6 +24,20 @@ class GibsAPI:
         self.wmts_endpoint = "/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/{date}" + \
                              "/GoogleMapsCompatible_Level9/{zoom}/{x}/{y}.jpg"
         self.quicklook_size = 512, 512
+
+    def extract_query_dates(self, query: STACQuery):
+        """
+        Extraction of query dates usable by GIBS WMTS
+
+        The MODIS block allows STAC parameters time and limit to be set. The MODIS dataset though offers a mostly
+        complete coverage of the whole earth every day. By combining time and limit parameters this method returns
+        a list of date that can be used for inclusion in WMTS GetTile requests.
+
+        :param query: A STACQuery object
+        :return: A list of GIBS WMTS consumable dates
+        """
+
+
 
     def download_wmts_tile_as_geotiff(self, date: str, tile: mercantile.Tile) -> BytesIO:
         tile_url = self.wmts_url + self.wmts_endpoint.format(date=date, x=tile.x, y=tile.y, zoom=tile.z)
