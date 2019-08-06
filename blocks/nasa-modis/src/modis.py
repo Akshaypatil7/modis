@@ -1,8 +1,10 @@
 import uuid
-
+from typing import List
 
 from geojson import FeatureCollection, Feature
 import mercantile
+from shapely.ops import unary_union
+from shapely.geometry import box
 
 from blockutils.geometry import filter_tiles_intersect_with_geometry
 from blockutils.stac import STACQuery
@@ -38,21 +40,27 @@ class Modis:
             ensure_data_directories_exist()
 
             # Get the list of tiles that cover the query AOI. Sorted by (y, x) in ascending order
-            bbox_tile_list = list(filter_tiles_intersect_with_geometry( \
+            tile_list = list(filter_tiles_intersect_with_geometry( \
                 tiles=mercantile.tiles(*query.bounds(), zooms=query.zoom_level, truncate=True),
                 geometry=query.geometry()))
 
             output_features: List[Feature] = []
 
-            for idx in range(query.limit):
+            date_list = self.api.extract_query_dates(query)
+
+            for query_date in date_list:
                 feature_id: str = str(uuid.uuid4())
 
                 # Fetch tiles and patch them together
+                self.api.get_merged_image(tile_list, query_date, feature_id)
 
-                feature = Feature()
+                return_poly = unary_union([box(*tuple(mercantile.bounds(bbox))) for bbox in tile_list])
+                feature = Feature(id=feature_id,
+                                  bbox=return_poly.bounds,
+                                  geometry=return_poly)
 
                 if not dry_run:
-                    set_capability(feature, AOICLIPPED, "%s.tif" % feature_id)
+                    feature["properties"]["up42.data.aoiclipped"] = "%s.tif" % feature_id
 
             logger.debug(feature)
             output_features.append(feature)
