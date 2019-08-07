@@ -25,7 +25,7 @@ class GibsAPI:
     def __init__(self):
         self.wmts_url = "https://gibs.earthdata.nasa.gov/wmts"
         self.wmts_endpoint = "/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/{date}" + \
-                             "/GoogleMapsCompatible_Level9/{zoom}/{x}/{y}.jpg"
+                             "/GoogleMapsCompatible_Level9/{zoom}/{y}/{x}.jpg"
         self.quicklook_size = 512, 512
 
     def extract_query_dates(self, query: STACQuery) -> list:
