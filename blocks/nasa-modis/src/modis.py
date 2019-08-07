@@ -51,19 +51,18 @@ class Modis:
             for query_date in date_list:
                 feature_id: str = str(uuid.uuid4())
 
-                # Fetch tiles and patch them together
-                self.api.get_merged_image(tile_list, query_date, feature_id)
-
                 return_poly = unary_union([box(*tuple(mercantile.bounds(bbox))) for bbox in tile_list])
                 feature = Feature(id=feature_id,
                                   bbox=return_poly.bounds,
                                   geometry=return_poly)
 
                 if not dry_run:
+                    # Fetch tiles and patch them together
+                    self.api.get_merged_image(tile_list, query_date, feature_id)
                     feature["properties"]["up42.data.aoiclipped"] = "%s.tif" % feature_id
 
-            logger.debug(feature)
-            output_features.append(feature)
+                logger.debug(feature)
+                output_features.append(feature)
 
             return FeatureCollection(list(output_features))
 
