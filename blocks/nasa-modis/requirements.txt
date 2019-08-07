@@ -1,10 +1,13 @@
 geojson
+rasterio
+shapely
+mercantile
+ciso8601
+python-dateutil
 pytest
 pytest-mypy
 pytest-cov
 pytest-pylint
 requests-mock
-rasterio
-shapely
-ciso8601
-mercantile
+
+

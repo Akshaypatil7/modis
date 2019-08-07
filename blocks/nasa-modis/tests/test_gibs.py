@@ -21,6 +21,7 @@ def test_extract_query_dates():
 
     # case (1)
     query = STACQuery.from_dict({
+
         "zoom_level": 9,
         "limit": 2,
         "bbox": [
@@ -31,12 +32,16 @@ def test_extract_query_dates():
         ]
     })
 
-    date_list = GibsAPI.extract_query_dates(query)
+    date_list = GibsAPI().extract_query_dates(query)
+    assert len(date_list) == 2
+    assert date_list[0] < date_list[1]
+    for date in date_list:
+        assert date.startswith('20')
 
-    # case (1)
+    # case (2)
     query = STACQuery.from_dict({
         "zoom_level": 9,
-        "time": "2016-04-01T16:40:49+00:00/2019-04-25T16:41:49+00:00",
+        "time": "2019-04-20T16:40:49+00:00/2019-04-25T17:45:49+00:00",
         "limit": 2,
         "bbox": [
             114.11227717995645,
@@ -46,12 +51,13 @@ def test_extract_query_dates():
         ]
     })
 
-    date_list = GibsAPI.extract_query_dates(query)
+    date_list = GibsAPI().extract_query_dates(query)
+    assert date_list == ['2019-04-24', '2019-04-25']
 
-    # case (1)
+    # case (3)
     query = STACQuery.from_dict({
         "zoom_level": 9,
-        "time": "2016-04-01T16:40:49+00:00/2019-04-02T16:41:49+00:00",
+        "time": "2019-04-01T16:40:49+00:00/2019-04-02T16:41:49+00:00",
         "limit": 4,
         "bbox": [
             114.11227717995645,
@@ -61,9 +67,10 @@ def test_extract_query_dates():
         ]
     })
 
-    date_list = GibsAPI.extract_query_dates(query)
+    date_list = GibsAPI().extract_query_dates(query)
+    assert date_list == ['2019-04-01', '2019-04-02']
 
-    # case (1)
+    # case (4)
     query = STACQuery.from_dict({
         "zoom_level": 9,
         "time": "2019-04-25T16:41:49+00:00",
@@ -76,7 +83,8 @@ def test_extract_query_dates():
         ]
     })
 
-    date_list = GibsAPI.extract_query_dates(query)
+    date_list = GibsAPI().extract_query_dates(query)
+    assert date_list == ['2019-04-25']
 
 
 def test_download_wmts_tile_as_geotiff(requests_mock):

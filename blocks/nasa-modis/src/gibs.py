@@ -1,7 +1,10 @@
 from io import BytesIO
 import tempfile
+import datetime
+from datetime import timedelta
 from pathlib import Path
 
+from dateutil import parser
 import requests
 import mercantile
 import rasterio as rio
@@ -25,7 +28,7 @@ class GibsAPI:
                              "/GoogleMapsCompatible_Level9/{zoom}/{x}/{y}.jpg"
         self.quicklook_size = 512, 512
 
-    def extract_query_dates(self, query: STACQuery):
+    def extract_query_dates(self, query: STACQuery) -> list:
         """
         Extraction of query dates usable by GIBS WMTS
 
@@ -37,6 +40,27 @@ class GibsAPI:
         :return: A list of GIBS WMTS consumable dates
         """
 
+        if query.time is None:
+            # Return latest [limit] dates counting from yesterday backwards
+            now = datetime.datetime.now()
+            date_list = sorted([(now - timedelta(days=idx + 1)).strftime('%Y-%m-%d') for idx in range(query.limit)])
+        else:
+            # time is set, first check if it is an interval or only one point in time
+            date_strings = str(query.time).split("/")
+            date_points = [parser.parse(date_str) for date_str in date_strings]
+            if len(date_points) == 2:
+                time_diff = date_points[1] - date_points[0]
+                days_in_interval = time_diff.days + bool(time_diff.seconds)
+                date_list = \
+                    [(date_points[1] - timedelta(days=idx)).strftime('%Y-%m-%d') for idx in range(days_in_interval)]
+                date_list.sort()
+                if len(date_list) > query.limit:
+                    # Only return the newest dates up to the limit
+                    date_list = date_list[-query.limit:]
+            else:
+                # Only one point in time is given; return only that date
+                date_list = [date_points[0].strftime('%Y-%m-%d')]
+        return date_list
 
 
     def download_wmts_tile_as_geotiff(self, date: str, tile: mercantile.Tile) -> BytesIO:
