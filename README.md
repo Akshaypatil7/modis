@@ -53,3 +53,14 @@ You can run all unit tests with:
 ```bash
 make test
 ```
+
+
+### Dockerizing the block and pushing it to the UP42 platform
+
+In order to publish the block on the platform several steps are necessary, they are also described on the platform itself.
+
+First the manifest needs to be validated
+
+```bash
+make validate
+```

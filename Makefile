@@ -10,3 +10,6 @@ clean:
 	find . -name ".pytest_cache" -exec rm -rf {} +
 	find . -name ".coverage" -exec rm -f {} +
 
+.PHONY validate:
+	curl -X POST -H 'Content-Type: application/json' -d @./blocks/nasa_modis/UP42Manifest.json https://api.up42.com/validate-schema/block
+
