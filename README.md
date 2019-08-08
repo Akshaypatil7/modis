@@ -53,3 +53,29 @@ You can run all unit tests with:
 ```bash
 make test
 ```
+
+
+### Dockerizing the block and pushing it to the UP42 platform
+
+In order to publish the block on the platform several steps are necessary which are described on the platform itself.
+Before doing that it is recommended practice to validate the manifest and execute a local end-to-end test.
+
+First the manifest needs to be validated
+
+```bash
+make validate
+```
+
+Next build the docker image
+
+```bash
+make build-image
+```
+
+Finally you can run the end-to-end test
+
+```bash
+make e2e
+```
+
+If none of the commands throws any errors you can push the block to the UP42 platform as a custom block.
