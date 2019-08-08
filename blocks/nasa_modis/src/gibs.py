@@ -1,3 +1,4 @@
+from typing import IO, Any
 from io import BytesIO
 import tempfile
 import datetime
@@ -24,8 +25,8 @@ class GibsAPI:
 
     def __init__(self):
         self.wmts_url = "https://gibs.earthdata.nasa.gov/wmts"
-        self.wmts_endpoint = "/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/{date}" + \
-                             "/GoogleMapsCompatible_Level9/{zoom}/{y}/{x}.jpg"
+        self.wmts_endpoint = "/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default" + \
+                             "/{date}/GoogleMapsCompatible_Level9/{zoom}/{y}/{x}.jpg"
         self.quicklook_size = 512, 512
 
     def extract_query_dates(self, query: STACQuery) -> list:
@@ -63,7 +64,7 @@ class GibsAPI:
         return date_list
 
 
-    def download_wmts_tile_as_geotiff(self, date: str, tile: mercantile.Tile) -> BytesIO:
+    def download_wmts_tile_as_geotiff(self, date: str, tile: mercantile.Tile) -> IO[Any]:
         tile_url = self.wmts_url + self.wmts_endpoint.format(date=date, x=tile.x, y=tile.y, zoom=tile.z)
 
         logger.debug(tile_url)
