@@ -98,23 +98,23 @@ class GibsAPI:
 
         logger.debug(quicklook_string)
 
-        r = requests.get(self.wms_url + self.wms_endpoint + quicklook_string)
+        response = requests.get(self.wms_url + self.wms_endpoint + quicklook_string)
 
-        if r.status_code != 200:
+        if response.status_code != 200:
             raise requests.exceptions.HTTPError("""Quicklook download unsuccessful
-                                    with status code """, r.status_code)
-        return r
+                                    with status code """, response.status_code)
+        return response
 
     def write_quicklook(self, bbox, date: str, output_uuid: str):
         """
         Write quicklook to the quicklook output location
         """
-        r = self.download_quicklook(bbox, date)
+        response = self.download_quicklook(bbox, date)
         name = "/tmp/quicklooks/%s.jpg" % (output_uuid)
-        with open(name, 'wb') as f:
-            for chunk in r.iter_content():
+        with open(name, 'wb') as ql_file:
+            for chunk in response.iter_content():
                 if chunk:
-                    f.write(chunk)
+                    ql_file.write(chunk)
 
     def download_wmts_tile_as_geotiff(self, date: str, tile: mercantile.Tile) -> IO[Any]:
         # pylint: disable=too-many-locals

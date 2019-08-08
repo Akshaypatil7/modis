@@ -166,6 +166,6 @@ def test_write_quicklook():
 
     assert os.path.isfile(quicklook_path)
 
-    im = Image.open(str(quicklook_path))
-    assert im.size == (512, 477)
-    assert im.mode == 'RGB'
+    image = Image.open(str(quicklook_path))
+    assert image.size == (512, 477)
+    assert image.mode == 'RGB'
