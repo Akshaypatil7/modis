@@ -7,6 +7,7 @@ from pathlib import Path
 
 from dateutil import parser
 import requests
+from requests import Response
 import mercantile
 import rasterio as rio
 
@@ -62,7 +63,58 @@ class GibsAPI:
         self.wmts_url = "https://gibs.earthdata.nasa.gov/wmts"
         self.wmts_endpoint = "/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default" + \
                              "/{date}/GoogleMapsCompatible_Level9/{zoom}/{y}/{x}.jpg"
+        self.wms_endpoint = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?" + \
+                            "REQUEST=GetMap&LAYERS=MODIS_Terra_CorrectedReflectance_TrueColor"
         self.quicklook_size = 512, 512
+
+    def download_quicklook(self, bbox, date: str) -> Response:
+        """
+        Fetches an RGB quicklook image using WMS
+        """
+        logger.debug("Will now fetch quicklook %s for date %s", bbox, date)
+        query_time = self.make_query_timespan(date)
+
+        width_height_ratio = abs((bbox[0] - bbox[2]) / (bbox[1] - bbox[3]))
+        if width_height_ratio > 1:
+            width = self.quicklook_size[0]
+            height = int(self.quicklook_size[1] / width_height_ratio)
+        else:
+            width = int(self.quicklook_size[0] * width_height_ratio)
+            height = self.quicklook_size[1]
+
+        params = {
+            "WIDTH": width,
+            "HEIGHT": height,
+            "BBOX": ",".join([str(coord) for coord in bbox]),
+            "TIME": query_time
+        }
+
+        quicklook_string = ("FORMAT=image/jpeg&" +
+                            "WIDTH={WIDTH}&" +
+                            "HEIGHT={HEIGHT}&" +
+                            "CRS=CRS:84&" +
+                            "BBOX={BBOX}&" +
+                            "TIME={TIME}").format(**params)
+
+        logger.debug(quicklook_string)
+
+        r = requests.get(self.wms_endpoint + quicklook_string)
+
+        if r.status_code != 200:
+            raise requests.exceptions.HTTPError("""Quicklook download unsuccessful
+                                    with status code """, r.status_code)
+        return r
+
+    def write_quicklook(self, bbox, date: str, output_uuid: str, layer: str):
+        """
+        Write quicklook to the quicklook output location
+        """
+        r = self.download_quicklook(bbox, date, layer)
+        name = "/tmp/quicklooks/%s.jpg" % (output_uuid)
+        with open(name, 'wb') as f:
+            for chunk in r.iter_content():
+                if chunk:
+                    f.write(chunk)
 
     def download_wmts_tile_as_geotiff(self, date: str, tile: mercantile.Tile) -> IO[Any]:
         # pylint: disable=too-many-locals
