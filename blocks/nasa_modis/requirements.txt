@@ -9,5 +9,6 @@ pytest-mypy
 pytest-cov
 pytest-pylint
 requests-mock
+Pillow
 
 

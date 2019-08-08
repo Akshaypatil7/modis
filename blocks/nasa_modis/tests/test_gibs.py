@@ -4,14 +4,21 @@ Unit tests for all methods in the Gibs module i.e. internal logic and API intera
 
 import os
 
+import pytest
 import mercantile
 import rasterio as rio
 from rasterio.crs import CRS
 from rasterio.transform import Affine
+from PIL import Image
 
 import requests_mock as mock
 
-from context import GibsAPI, extract_query_dates, STACQuery
+from context import GibsAPI, extract_query_dates, ensure_data_directories_exist, STACQuery
+
+
+@pytest.fixture(scope="session", autouse=True)
+def fixture():
+    ensure_data_directories_exist()
 
 
 def test_extract_query_dates():
@@ -145,3 +152,20 @@ def test_get_merged_image():
 
     with rio.open(str(result_filename)) as dataset:
         assert dataset.meta == expected_meta
+
+
+def test_write_quicklook():
+
+    test_bbox = (38.671875, 20.632784250388017, 40.078125, 21.943045533438177)
+    test_query_date = '2019-01-24'
+    test_uuid = '17afe6e1-f10d-43a8-ac16-2a5e3404bc36'
+
+    GibsAPI().write_quicklook(test_bbox, test_query_date, test_uuid)
+
+    quicklook_path = "/tmp/quicklooks/%s.jpg" %test_uuid
+
+    assert os.path.isfile(quicklook_path)
+
+    im = Image.open(str(quicklook_path))
+    assert im.size == (512, 477)
+    assert im.mode == 'RGB'

@@ -12,3 +12,4 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../s
 from modis import Modis
 from gibs import GibsAPI, extract_query_dates
 from blockutils.stac import STACQuery
+from blockutils.common import ensure_data_directories_exist
