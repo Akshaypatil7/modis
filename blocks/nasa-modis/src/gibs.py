@@ -121,8 +121,6 @@ class GibsAPI:
         with rio.open(img_filename, "w", **merged_img_meta) as dataset:
             dataset.write(out_ar)
 
-        # TODO don't forget cleanup
-
         return Path(img_filename)
 
     def write_quicklook(self, output_uuid: str) -> str:
