@@ -48,12 +48,14 @@ class Modis:
             date_list = extract_query_dates(query)
 
             for query_date in date_list:
-                feature_id: str = str(uuid.uuid4())
 
+                feature_id: str = str(uuid.uuid4())
                 return_poly = unary_union([box(*tuple(mercantile.bounds(bbox))) for bbox in tile_list])
                 feature = Feature(id=feature_id,
                                   bbox=return_poly.bounds,
                                   geometry=return_poly)
+
+                self.api.write_quicklook(return_poly.bounds, query_date, feature_id)
 
                 if not dry_run:
                     # Fetch tiles and patch them together

@@ -31,6 +31,7 @@ def test_aoiclipped_fetcher_fetch_in_dry_run_mode():
 
     assert len(result.features) == 1
     assert "up42.data.aoiclipped" not in result.features[0]["properties"].keys()
+    assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
 
 
 def test_aoiclipped_fetcher_fetch(requests_mock):
@@ -64,6 +65,7 @@ def test_aoiclipped_fetcher_fetch(requests_mock):
     with rio.open(img_filename) as dataset:
         band2 = dataset.read(2)
         assert np.sum(band2) == 7954025
+    assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
 
 
 def test_aoiclipped_fetcher_fetch_live():
@@ -91,3 +93,4 @@ def test_aoiclipped_fetcher_fetch_live():
     with rio.open(img_filename) as dataset:
         band2 = dataset.read(2)
         assert np.sum(band2) == 28360474
+    assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
