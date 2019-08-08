@@ -1,3 +1,8 @@
+"""
+Abstract Fetcher class definitions
+"""
+
+
 from .stac import STACQuery
 
 class AbstractFetcher:

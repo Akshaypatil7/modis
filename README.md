@@ -47,3 +47,9 @@ After creating a virtual environment and activating it, all the necessary librar
 ```bash
 make install
 ```
+
+You can run all unit tests with:
+
+```bash
+make test
+```

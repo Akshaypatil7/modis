@@ -1,4 +1,0 @@
-rasterio
-shapely
-ciso8601
-mercanatile

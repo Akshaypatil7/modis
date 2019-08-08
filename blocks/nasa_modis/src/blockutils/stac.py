@@ -1,3 +1,7 @@
+"""
+STAC query according to https://github.com/radiantearth/stac-spec
+"""
+
 from __future__ import annotations
 
 import json

@@ -1,0 +1,11 @@
+[MESSAGE CONTROL]
+disable=
+    missing-docstring,
+    no-else-return,
+    too-few-public-methods,
+    too-many-boolean-expressions,
+
+[FORMAT]
+max-line-length=120
+# "logger" and "api" are common module-level globals, and not true 'constants'
+const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__)|logger|api|_api)$
