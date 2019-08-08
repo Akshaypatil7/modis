@@ -1,3 +1,7 @@
+"""
+Geometry-related utilities
+"""
+
 from typing import List, Generator
 import mercantile
 import geojson

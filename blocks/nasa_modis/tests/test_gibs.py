@@ -11,7 +11,7 @@ from rasterio.transform import Affine
 
 import requests_mock as mock
 
-from context import GibsAPI, STACQuery
+from context import GibsAPI, extract_query_dates, STACQuery
 
 
 def test_extract_query_dates():
@@ -36,7 +36,7 @@ def test_extract_query_dates():
         ]
     })
 
-    date_list = GibsAPI().extract_query_dates(query)
+    date_list = extract_query_dates(query)
     assert len(date_list) == 2
     assert date_list[0] < date_list[1]
     for date in date_list:
@@ -55,7 +55,7 @@ def test_extract_query_dates():
         ]
     })
 
-    date_list = GibsAPI().extract_query_dates(query)
+    date_list = extract_query_dates(query)
     assert date_list == ['2019-04-24', '2019-04-25']
 
     # case (3)
@@ -71,7 +71,7 @@ def test_extract_query_dates():
         ]
     })
 
-    date_list = GibsAPI().extract_query_dates(query)
+    date_list = extract_query_dates(query)
     assert date_list == ['2019-04-01', '2019-04-02']
 
     # case (4)
@@ -87,7 +87,7 @@ def test_extract_query_dates():
         ]
     })
 
-    date_list = GibsAPI().extract_query_dates(query)
+    date_list = extract_query_dates(query)
     assert date_list == ['2019-04-25']
 
 

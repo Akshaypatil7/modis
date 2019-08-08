@@ -2,7 +2,6 @@ import json
 import os
 import pathlib
 from enum import Enum
-from typing import Union
 
 from geojson import FeatureCollection, Feature
 
@@ -46,8 +45,8 @@ def load_metadata() -> FeatureCollection:
     """
     ensure_data_directories_exist()
     if os.path.exists("/tmp/input/data.json"):
-        with open("/tmp/input/data.json") as fp:
-            data = json.loads(fp.read())
+        with open("/tmp/input/data.json") as json_file:
+            data = json.loads(json_file.read())
 
         features = []
         for feature in data["features"]:
@@ -63,8 +62,8 @@ def save_metadata(result: FeatureCollection):
     Save the geojson metadata to the provided location
     """
     ensure_data_directories_exist()
-    with open("/tmp/output/data.json", "w") as fp:
-        fp.write(json.dumps(result))
+    with open("/tmp/output/data.json", "w") as json_file:
+        json_file.write(json.dumps(result))
 
 
 class BlockModes(Enum):
@@ -81,4 +80,3 @@ def get_block_mode() -> str:
     if value not in [mode.value for mode in BlockModes]:
         value = 'DEFAULT'
     return value
-

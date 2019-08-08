@@ -21,6 +21,41 @@ logger = get_logger(__name__)
 class WMTSException(Exception):
     pass
 
+def extract_query_dates(query: STACQuery) -> list:
+    """
+    Extraction of query dates usable by GIBS WMTS
+
+    The MODIS block allows STAC parameters time and limit to be set. The MODIS dataset though offers a mostly
+    complete coverage of the whole earth every day. By combining time and limit parameters this method returns
+    a list of date that can be used for inclusion in WMTS GetTile requests.
+
+    :param query: A STACQuery object
+    :return: A list of GIBS WMTS consumable dates
+    """
+
+    if query.time is None:
+        # Return latest [limit] dates counting from yesterday backwards
+        now = datetime.datetime.now()
+        date_list = sorted([(now - timedelta(days=idx + 1)).strftime('%Y-%m-%d') for idx in range(query.limit)])
+    else:
+        # time is set, first check if it is an interval or only one point in time
+        date_strings = str(query.time).split("/")
+        date_points = [parser.parse(date_str) for date_str in date_strings]
+        if len(date_points) == 2:
+            time_diff = date_points[1] - date_points[0]
+            days_in_interval = time_diff.days + bool(time_diff.seconds)
+            date_list = \
+                [(date_points[1] - timedelta(days=idx)).strftime('%Y-%m-%d') for idx in range(days_in_interval)]
+            date_list.sort()
+            if len(date_list) > query.limit:
+                # Only return the newest dates up to the limit
+                date_list = date_list[-query.limit:]
+        else:
+            # Only one point in time is given; return only that date
+            date_list = [date_points[0].strftime('%Y-%m-%d')]
+    return date_list
+
+
 class GibsAPI:
 
     def __init__(self):
@@ -29,42 +64,8 @@ class GibsAPI:
                              "/{date}/GoogleMapsCompatible_Level9/{zoom}/{y}/{x}.jpg"
         self.quicklook_size = 512, 512
 
-    def extract_query_dates(self, query: STACQuery) -> list:
-        """
-        Extraction of query dates usable by GIBS WMTS
-
-        The MODIS block allows STAC parameters time and limit to be set. The MODIS dataset though offers a mostly
-        complete coverage of the whole earth every day. By combining time and limit parameters this method returns
-        a list of date that can be used for inclusion in WMTS GetTile requests.
-
-        :param query: A STACQuery object
-        :return: A list of GIBS WMTS consumable dates
-        """
-
-        if query.time is None:
-            # Return latest [limit] dates counting from yesterday backwards
-            now = datetime.datetime.now()
-            date_list = sorted([(now - timedelta(days=idx + 1)).strftime('%Y-%m-%d') for idx in range(query.limit)])
-        else:
-            # time is set, first check if it is an interval or only one point in time
-            date_strings = str(query.time).split("/")
-            date_points = [parser.parse(date_str) for date_str in date_strings]
-            if len(date_points) == 2:
-                time_diff = date_points[1] - date_points[0]
-                days_in_interval = time_diff.days + bool(time_diff.seconds)
-                date_list = \
-                    [(date_points[1] - timedelta(days=idx)).strftime('%Y-%m-%d') for idx in range(days_in_interval)]
-                date_list.sort()
-                if len(date_list) > query.limit:
-                    # Only return the newest dates up to the limit
-                    date_list = date_list[-query.limit:]
-            else:
-                # Only one point in time is given; return only that date
-                date_list = [date_points[0].strftime('%Y-%m-%d')]
-        return date_list
-
-
     def download_wmts_tile_as_geotiff(self, date: str, tile: mercantile.Tile) -> IO[Any]:
+        # pylint: disable=too-many-locals
         tile_url = self.wmts_url + self.wmts_endpoint.format(date=date, x=tile.x, y=tile.y, zoom=tile.z)
 
         logger.debug(tile_url)
@@ -96,7 +97,6 @@ class GibsAPI:
 
         return tmp_file
 
-
     def get_merged_image(self, tiles: list, date: str, output_uuid: str) -> Path:
         """
         Fetches all tiles for one date, merges them and returns a GeoTIFF
@@ -123,13 +123,3 @@ class GibsAPI:
             dataset.write(out_ar)
 
         return Path(img_filename)
-
-    def write_quicklook(self, output_uuid: str) -> str:
-        """
-        Write quicklook (downsampled image) to disk
-        """
-        pass
-
-
-
-

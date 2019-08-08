@@ -13,8 +13,7 @@ from blockutils.fetcher import AbstractFetcher, AbstractAOIClippedFetcher
 from blockutils.common import (load_query, save_metadata, ensure_data_directories_exist,
                                BlockModes, get_block_mode)
 
-
-from gibs import GibsAPI
+from gibs import GibsAPI, extract_query_dates
 
 logger = get_logger(__name__)
 
@@ -46,7 +45,7 @@ class Modis:
 
             output_features: List[Feature] = []
 
-            date_list = self.api.extract_query_dates(query)
+            date_list = extract_query_dates(query)
 
             for query_date in date_list:
                 feature_id: str = str(uuid.uuid4())
@@ -65,4 +64,3 @@ class Modis:
                 output_features.append(feature)
 
             return FeatureCollection(list(output_features))
-
