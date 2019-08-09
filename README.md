@@ -20,7 +20,7 @@ MODIS imagery.
 
 ### Local development HOWTO
 
-Clone the repository zo a given `<directory>`:
+Clone the repository to a given `<directory>`:
 
 ```bash
 git clone https://github.com/up42/modis.git <directory>
