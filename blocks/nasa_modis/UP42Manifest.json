@@ -23,8 +23,8 @@
       "type": "medium"
     },
     "optional_features": {
-      "quicklook_supported": false,
-      "dry_run_supported": false
+      "quicklook_supported": true,
+      "dry_run_supported": true
     },
     "input_capabilities": {
     },
