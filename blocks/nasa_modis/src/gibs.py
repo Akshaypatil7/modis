@@ -3,7 +3,9 @@ from io import BytesIO
 import tempfile
 import datetime
 from datetime import timedelta
+import xml.etree.ElementTree as ET
 from pathlib import Path
+
 
 from dateutil import parser
 import requests
@@ -67,6 +69,18 @@ class GibsAPI:
         self.wms_endpoint = "/epsg4326/best/wms.cgi?" + \
                             "SERVICE=WMS&REQUEST=GetMap&LAYERS=MODIS_Terra_CorrectedReflectance_TrueColor&"
         self.quicklook_size = 512, 512
+
+    def get_capabilities(self) -> Response:
+        url = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?SERVICE=WMTS&request=GetCapabilities"
+        response = requests.request("GET", url)
+        return response.content
+
+    def get_list_available_layers(self):
+        capabilities = ET.fromstring(self.get_capabilities())
+        layers = []
+        for layer in capabilities[3].getchildren():
+            layers += [layer.find("{http://www.opengis.net/ows/1.1}Identifier").text]
+        return layers
 
     def download_quicklook(self, bbox, date: str) -> Response:
         """
