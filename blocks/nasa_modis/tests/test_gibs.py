@@ -20,6 +20,13 @@ from context import GibsAPI, extract_query_dates, ensure_data_directories_exist,
 def fixture():
     ensure_data_directories_exist()
 
+def test_get_capabilities():
+    assert GibsAPI().get_capabilities().status_code == 200
+
+def test_get_list_available_layers():
+    layers = GibsAPI().get_list_available_layers()
+    print(len(layers))
+    assert len(layers) >= 872
 
 def test_extract_query_dates():
     """
