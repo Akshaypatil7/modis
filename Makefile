@@ -1,5 +1,5 @@
 install:
-	pip install -r blocks/nasa-modis/requirements.txt
+	pip install -r blocks/nasa_modis/requirements.txt
 
 test:
 	python -m pytest --pylint --pylint-rcfile=../../pylintrc --mypy --mypy-ignore-missing-imports --cov=src/
