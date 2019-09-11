@@ -73,13 +73,15 @@ class GibsAPI:
     def get_capabilities(self) -> Response:
         url = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?SERVICE=WMTS&request=GetCapabilities"
         response = requests.request("GET", url)
-        return response.content
+        return response
 
     def get_list_available_layers(self):
-        capabilities = ET.fromstring(self.get_capabilities())
+        capabilities = ET.fromstring(self.get_capabilities().content)
         layers = []
-        for layer in capabilities[3].getchildren():
-            layers += [layer.find("{http://www.opengis.net/ows/1.1}Identifier").text]
+        for layer in list(capabilities[3]):
+            l = (layer.find("{http://www.opengis.net/ows/1.1}Identifier").text,
+            layer.find("{http://www.opengis.net/wmts/1.0}TileMatrixSetLink/{http://www.opengis.net/wmts/1.0}TileMatrixSet").text)
+            layers += [l]
         return layers
 
     def download_quicklook(self, bbox, date: str) -> Response:
