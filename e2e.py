@@ -17,7 +17,8 @@ if __name__ == "__main__":
         file_path.unlink()
 
     RUN_CMD = """docker run -v /tmp/e2e_modis:/tmp \
-                 -e 'UP42_TASK_PARAMETERS={"bbox":[18.433567,-33.917003,18.439345,-33.912106]}' -it nasa-modis"""
+                 -e 'UP42_TASK_PARAMETERS={"bbox":[18.433567,-33.917003,18.439345,-33.912106], "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]}' \
+                 -it nasa-modis"""
     os.system(RUN_CMD)
 
     GEOJSON_PATH = OUTPUT_DIR / 'output' / 'data.json'
