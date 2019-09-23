@@ -45,6 +45,20 @@ def test_get_list_available_layers(requests_mock):
            == 'MODIS_Aqua_CorrectedReflectance_TrueColor'
     assert len(layers) == 45
 
+def test_validate_layers(requests_mock):
+    _location_ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+    with open(os.path.join(_location_, 'mock_data/available_layers.xml'), "rb") as xml_file:
+        fake_xml: object = xml_file.read()
+
+    requests_mock.get(mock.ANY, content=fake_xml)
+
+    valid = GibsAPI().validate_layers(['MODIS_Aqua_CorrectedReflectance_TrueColor'], [50, 50, 60, 60])
+    assert valid
+
+    valid = GibsAPI().validate_layers(['ABC'], [50, 50, 60, 60])
+    assert not valid
+
 def test_extract_query_dates():
     """
     time parameter  is always set, be default to 1. We therefore have the following cases to test:

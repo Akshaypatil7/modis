@@ -92,6 +92,21 @@ class GibsAPI:
                 layers[candidate["Identifier"]] = candidate
         return layers
 
+    def validate_layers(self, layers, bbox):
+        available_layers = self.get_list_available_layers()
+        search_geom = box(*bbox)
+
+        is_name = True
+        has_intersection = True
+
+        for each_layer in layers:
+            is_name = each_layer in available_layers.keys() and is_name
+            if is_name:
+                has_intersection = available_layers[each_layer]["WGS84BoundingBox"].intersects(search_geom) and has_intersection
+
+        return is_name and has_intersection
+
+
     def download_quicklook(self, bbox, date: str) -> Response:
         """
         Fetches an RGB quicklook image using WMS
