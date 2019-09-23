@@ -38,6 +38,76 @@ def test_aoiclipped_fetcher_fetch_in_dry_run_mode():
     assert "up42.data.aoiclipped" not in result.features[0]["properties"].keys()
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
 
+@pytest.mark.live
+def test_aoiclipped_fetcher_multiple_fetch_in_dry_run_mode():
+    """
+    Test for dry-run mode i.e. only metadata is returned, multiple layers
+    """
+
+    query = STACQuery.from_dict({
+        "zoom_level": 9,
+        "time": "2018-11-01T16:40:49+00:00/2018-11-20T16:41:49+00:00",
+        "limit": 1,
+        "bbox": [
+            123.59349578619005,
+            -10.188159969024264,
+            123.70257586240771,
+            -10.113232998848046
+        ],
+        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor",
+                   "MODIS_Aqua_CorrectedReflectance_TrueColor"]
+    })
+
+    result = Modis.AOIClippedFetcher().fetch(query, dry_run=True)
+
+    assert len(result.features) == 2
+    assert "up42.data.aoiclipped" not in result.features[0]["properties"].keys()
+    assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
+
+@pytest.mark.live
+def test_aoiclipped_fetcher_layer_error_fetch_in_dry_run_mode():
+    """
+    Test for dry-run mode i.e. only metadata is returned, error in name of layer
+    """
+
+    query = STACQuery.from_dict({
+        "zoom_level": 9,
+        "time": "2018-11-01T16:40:49+00:00/2018-11-20T16:41:49+00:00",
+        "limit": 1,
+        "bbox": [
+            123.59349578619005,
+            -10.188159969024264,
+            123.70257586240771,
+            -10.113232998848046
+        ],
+        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor",
+                   "AN_ERROR_FOR_SURE"]
+    })
+
+    with pytest.raises(ValueError, match=r".*['AN_ERROR_FOR_SURE'].*"):
+        Modis.AOIClippedFetcher().fetch(query, dry_run=True)
+
+@pytest.mark.live
+def test_aoiclipped_fetcher_geom_error_fetch_in_dry_run_mode():
+    """
+    Test for dry-run mode i.e. only metadata is returned, error in geometry
+    """
+
+    query = STACQuery.from_dict({
+        "zoom_level": 9,
+        "time": "2018-11-01T16:40:49+00:00/2018-11-20T16:41:49+00:00",
+        "limit": 1,
+        "bbox": [
+            200,
+            200,
+            210,
+            210
+        ],
+        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]
+    })
+
+    with pytest.raises(ValueError):
+        Modis.AOIClippedFetcher().fetch(query, dry_run=True)
 
 def test_aoiclipped_fetcher_fetch(requests_mock):
     """
@@ -112,3 +182,78 @@ def test_aoiclipped_fetcher_fetch_live():
         band2 = dataset.read(2)
         assert np.sum(band2) == 28360474
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
+
+@pytest.mark.live
+def test_aoiclipped_fetcher_multiple_fetch_live():
+    """
+    Unmocked ("live") test for fetching data, multiple layers
+    """
+
+    query = STACQuery.from_dict({
+        "zoom_level": 9,
+        "time": "2019-01-01T16:40:49+00:00/2019-01-25T16:41:49+00:00",
+        "limit": 2,
+        "bbox": [
+            38.941807150840766,
+            21.288749561718983,
+            39.686130881309516,
+            21.808610762909364
+        ],
+        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor",
+                   "MODIS_Aqua_CorrectedReflectance_TrueColor"]
+    })
+
+    result = Modis.AOIClippedFetcher().fetch(query, dry_run=False)
+
+    assert len(result.features) == 4
+
+    img_filename = "/tmp/output/%s" % result.features[0]["properties"]["up42.data.aoiclipped"]
+    with rio.open(img_filename) as dataset:
+        band2 = dataset.read(2)
+        assert np.sum(band2) == 28360474
+    assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
+
+@pytest.mark.live
+def test_aoiclipped_fetcher_layer_error_fetch_live():
+    """
+    Unmocked ("live") test for fetching data, error in name of layer
+    """
+
+    query = STACQuery.from_dict({
+        "zoom_level": 9,
+        "time": "2019-01-01T16:40:49+00:00/2019-01-25T16:41:49+00:00",
+        "limit": 2,
+        "bbox": [
+            38.941807150840766,
+            21.288749561718983,
+            39.686130881309516,
+            21.808610762909364
+        ],
+        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor",
+                   "AN_ERROR_FOR_SURE"]
+    })
+
+    with pytest.raises(ValueError, match=r".*['AN_ERROR_FOR_SURE'].*"):
+        Modis.AOIClippedFetcher().fetch(query, dry_run=False)
+
+@pytest.mark.live
+def test_aoiclipped_fetcher_geom_error_fetch_live():
+    """
+    Unmocked ("live") test for fetching data, error in geometry of layer
+    """
+
+    query = STACQuery.from_dict({
+        "zoom_level": 9,
+        "time": "2019-01-01T16:40:49+00:00/2019-01-25T16:41:49+00:00",
+        "limit": 2,
+        "bbox": [
+            200,
+            200,
+            210,
+            210
+        ],
+        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]
+    })
+
+    with pytest.raises(ValueError):
+        Modis.AOIClippedFetcher().fetch(query, dry_run=False)

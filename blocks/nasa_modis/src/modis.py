@@ -34,6 +34,8 @@ class Modis:
         def __init__(self):
             self.api = GibsAPI()
 
+        # pylint: disable=too-many-locals
+        # Variables for fetcher TODO
         def fetch(self, query: STACQuery, dry_run: bool = False) -> FeatureCollection:
 
             ensure_data_directories_exist()
@@ -47,6 +49,14 @@ class Modis:
 
             date_list = extract_query_dates(query)
             layer_list = query.layers
+
+            logger.debug("Checking layer %r", layer_list)
+            are_valid, invalid_names, invalid_geom = self.api.validate_layers(layer_list, query.bounds())
+            if are_valid:
+                logger.debug("Layers %r OK!", layer_list)
+            else:
+                raise ValueError("Invalid Layers. %r have invalid names."
+                                 "%r are layer bounds, search should be within this." % (invalid_names, invalid_geom))
 
             for layer in layer_list:
                 for query_date in date_list:
