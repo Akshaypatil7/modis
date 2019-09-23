@@ -17,7 +17,8 @@
       "contains": {"type": "geometry"},
       "time": {"type": "dateRange", "default": null},
       "limit": {"type": "integer", "minimum": 1, "default": 1},
-      "zoom_level": {"type": "integer", "minimum": 9, "maximum": 9, "default": 9}
+      "zoom_level": {"type": "integer", "minimum": 9, "maximum": 9, "default": 9},
+      "layers": {"type": "array", "default": ["MODIS_Terra_CorrectedReflectance_TrueColor"]}
     },
     "machine": {
       "type": "medium"
