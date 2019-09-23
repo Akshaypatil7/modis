@@ -51,14 +51,14 @@ class Modis:
             layer_list = query.layers
 
             logger.debug("Checking layer %r", layer_list)
-            are_valid, invalid_names, invalid_geom = self.api.validate_layers(layer_list, query.bounds())
+            are_valid, invalid_names, invalid_geom, valid_layers = self.api.validate_layers(layer_list, query.bounds())
             if are_valid:
                 logger.debug("Layers %r OK!", layer_list)
             else:
                 raise ValueError("Invalid Layers. %r have invalid names."
                                  "%r are layer bounds, search should be within this." % (invalid_names, invalid_geom))
 
-            for layer in layer_list:
+            for layer in valid_layers:
                 for query_date in date_list:
 
                     feature_id: str = str(uuid.uuid4())
@@ -71,7 +71,9 @@ class Modis:
 
                     if not dry_run:
                         # Fetch tiles and patch them together
-                        self.api.get_merged_image(layer, tile_list, query_date, feature_id)
+                        self.api.get_merged_image(layer, tile_list, query_date,
+                                                  feature_id,
+                                                  img_format=valid_layers[layer]['Format'])
                         feature["properties"]["up42.data.aoiclipped"] = "%s.tif" % feature_id
 
                     logger.debug(feature)

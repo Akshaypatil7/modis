@@ -66,7 +66,7 @@ class GibsAPI:
         self.wmts_url = "https://gibs.earthdata.nasa.gov/wmts"
         self.get_capabilities_url = "/epsg3857/best/1.0.0/WMTSCapabilities.xml"
         self.wmts_endpoint = "/epsg3857/best/{layer}/default" + \
-                             "/{date}/GoogleMapsCompatible_Level9/{zoom}/{y}/{x}.jpg"
+                             "/{date}/GoogleMapsCompatible_Level9/{zoom}/{y}/{x}.{img_format}"
         self.wms_url = "https://gibs.earthdata.nasa.gov/wms"
         self.wms_endpoint = "/epsg4326/best/wms.cgi?" + \
                             "SERVICE=WMS&REQUEST=GetMap&"
@@ -87,7 +87,7 @@ class GibsAPI:
             extent_bbox = box(*coords)
             candidate = {"Identifier": layer.find("{http://www.opengis.net/ows/1.1}Identifier").text,
                          "TileMatrixSet": layer.find("{http://www.opengis.net/wmts/1.0}TileMatrixSetLink").find("{http://www.opengis.net/wmts/1.0}TileMatrixSet").text,
-                         "WGS84BoundingBox": extent_bbox}
+                         "WGS84BoundingBox": extent_bbox, "Format": layer.find("{http://www.opengis.net/wmts/1.0}Format").text.split("/")[1]}
             if candidate["TileMatrixSet"] == "GoogleMapsCompatible_Level9":
                 layers[candidate["Identifier"]] = candidate
         return layers
@@ -102,16 +102,20 @@ class GibsAPI:
         invalid_names = []
         invalid_geom = []
 
+        valid_layers = {}
+
         for each_layer in layers:
             is_name = each_layer in available_layers.keys() and is_name
             if is_name:
                 has_intersection = available_layers[each_layer]["WGS84BoundingBox"].intersects(search_geom) and has_intersection
                 if not has_intersection:
                     invalid_geom += [available_layers[each_layer]["WGS84BoundingBox"].wkt]
+                else:
+                    valid_layers[each_layer] = available_layers[each_layer]
             else:
                 invalid_names += [each_layer]
 
-        return (is_name and has_intersection), invalid_names, invalid_geom
+        return (is_name and has_intersection), invalid_names, invalid_geom, valid_layers
 
 
     def download_quicklook(self, layer: str, bbox, date: str) -> Response:
@@ -164,9 +168,14 @@ class GibsAPI:
                 if chunk:
                     ql_file.write(chunk)
 
-    def download_wmts_tile_as_geotiff(self, layer: str, date: str, tile: mercantile.Tile) -> IO[Any]:
+    def download_wmts_tile_as_geotiff(self, layer: str, date: str, tile: mercantile.Tile, img_format: str = "jpg") -> IO[Any]:
         # pylint: disable=too-many-locals
-        tile_url = self.wmts_url + self.wmts_endpoint.format(layer=layer, date=date, x=tile.x, y=tile.y, zoom=tile.z)
+        tile_url = self.wmts_url + self.wmts_endpoint.format(layer=layer,
+                                                             date=date,
+                                                             x=tile.x,
+                                                             y=tile.y,
+                                                             zoom=tile.z,
+                                                             img_format=img_format)
 
         logger.debug(tile_url)
 
@@ -178,7 +187,7 @@ class GibsAPI:
         img: rio.MemoryFile = BytesIO(wmts_response.content)
 
         bands = []
-        with rio.open(img, driver='JPEG') as image:
+        with rio.open(img) as image:
             for i in range(image.count):
                 bands.append(image.read(i + 1))
             tile_meta = image.meta
@@ -197,7 +206,9 @@ class GibsAPI:
 
         return tmp_file
 
-    def get_merged_image(self, layer: str, tiles: list, date: str, output_uuid: str) -> Path:
+    # pylint: disable=too-many-arguments
+    # Merged image requires all args, TODO
+    def get_merged_image(self, layer: str, tiles: list, date: str, output_uuid: str, img_format: str = "jpg") -> Path:
         """
         Fetches all tiles for one date, merges them and returns a GeoTIFF
         """
@@ -205,7 +216,7 @@ class GibsAPI:
         img_files = []
         logger.info("Downloading tiles")
         for tile in tiles:
-            tiff_file = self.download_wmts_tile_as_geotiff(layer, date, tile)
+            tiff_file = self.download_wmts_tile_as_geotiff(layer, date, tile, img_format)
             img_files.append(rio.open(tiff_file.name, driver="GTiff"))
         # Now merge the images
         out_ar, out_trans = merge(img_files)
