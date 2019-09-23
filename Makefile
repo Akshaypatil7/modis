@@ -2,10 +2,10 @@ install:
 	pip install -r blocks/nasa_modis/requirements.txt
 
 test:
-	python -m pytest --pylint --pylint-rcfile=../../pylintrc --mypy --mypy-ignore-missing-imports --cov=src/
+	python -m pytest --pylint --pylint-rcfile=../../pylintrc --mypy --mypy-ignore-missing-imports --cov=blocks/nasa_modis/src/
 
 test[live]:
-	python -m pytest --pylint --pylint-rcfile=../../pylintrc --mypy --mypy-ignore-missing-imports --cov=src/ --runlive
+	python -m pytest --pylint --pylint-rcfile=../../pylintrc --mypy --mypy-ignore-missing-imports --cov=blocks/nasa_modis/src/ --runlive
 
 clean:
 	find . -name "__pycache__" -exec rm -rf {} +
