@@ -65,11 +65,11 @@ class GibsAPI:
     def __init__(self):
         self.wmts_url = "https://gibs.earthdata.nasa.gov/wmts"
         self.get_capabilities_url = "/epsg3857/best/1.0.0/WMTSCapabilities.xml"
-        self.wmts_endpoint = "/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default" + \
+        self.wmts_endpoint = "/epsg3857/best/{layer}/default" + \
                              "/{date}/GoogleMapsCompatible_Level9/{zoom}/{y}/{x}.jpg"
         self.wms_url = "https://gibs.earthdata.nasa.gov/wms"
         self.wms_endpoint = "/epsg4326/best/wms.cgi?" + \
-                            "SERVICE=WMS&REQUEST=GetMap&LAYERS=MODIS_Terra_CorrectedReflectance_TrueColor&"
+                            "SERVICE=WMS&REQUEST=GetMap&"
         self.quicklook_size = 512, 512
 
     def get_capabilities(self) -> Response:
@@ -107,7 +107,7 @@ class GibsAPI:
         return is_name and has_intersection
 
 
-    def download_quicklook(self, bbox, date: str) -> Response:
+    def download_quicklook(self, layer: str, bbox, date: str) -> Response:
         """
         Fetches an RGB quicklook image using WMS
         """
@@ -122,13 +122,15 @@ class GibsAPI:
             height = self.quicklook_size[1]
 
         params = {
+            "LAYER": layer,
             "WIDTH": width,
             "HEIGHT": height,
             "BBOX": ",".join([str(coord) for coord in bbox]),
             "TIME": date
         }
 
-        quicklook_string = ("FORMAT=image/jpeg&" +
+        quicklook_string = ("LAYERS={LAYER}&" +
+                            "FORMAT=image/jpeg&" +
                             "WIDTH={WIDTH}&" +
                             "HEIGHT={HEIGHT}&" +
                             "CRS=CRS:84&" +
@@ -144,20 +146,20 @@ class GibsAPI:
                                     with status code """, response.status_code)
         return response
 
-    def write_quicklook(self, bbox, date: str, output_uuid: str):
+    def write_quicklook(self, layer: str, bbox, date: str, output_uuid: str):
         """
         Write quicklook to the quicklook output location
         """
-        response = self.download_quicklook(bbox, date)
+        response = self.download_quicklook(layer, bbox, date)
         name = "/tmp/quicklooks/%s.jpg" % (output_uuid)
         with open(name, 'wb') as ql_file:
             for chunk in response.iter_content():
                 if chunk:
                     ql_file.write(chunk)
 
-    def download_wmts_tile_as_geotiff(self, date: str, tile: mercantile.Tile) -> IO[Any]:
+    def download_wmts_tile_as_geotiff(self, layer: str, date: str, tile: mercantile.Tile) -> IO[Any]:
         # pylint: disable=too-many-locals
-        tile_url = self.wmts_url + self.wmts_endpoint.format(date=date, x=tile.x, y=tile.y, zoom=tile.z)
+        tile_url = self.wmts_url + self.wmts_endpoint.format(layer=layer, date=date, x=tile.x, y=tile.y, zoom=tile.z)
 
         logger.debug(tile_url)
 
@@ -188,7 +190,7 @@ class GibsAPI:
 
         return tmp_file
 
-    def get_merged_image(self, tiles: list, date: str, output_uuid: str) -> Path:
+    def get_merged_image(self, layer: str, tiles: list, date: str, output_uuid: str) -> Path:
         """
         Fetches all tiles for one date, merges them and returns a GeoTIFF
         """
@@ -196,7 +198,7 @@ class GibsAPI:
         img_files = []
         logger.info("Downloading tiles")
         for tile in tiles:
-            tiff_file = self.download_wmts_tile_as_geotiff(date, tile)
+            tiff_file = self.download_wmts_tile_as_geotiff(layer, date, tile)
             img_files.append(rio.open(tiff_file.name, driver="GTiff"))
         # Now merge the images
         out_ar, out_trans = merge(img_files)

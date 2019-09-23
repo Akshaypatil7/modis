@@ -158,13 +158,14 @@ def test_download_wmts_tile_as_geotiff(requests_mock):
     _location_ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     test_tile = mercantile.Tile(x=290, y=300, z=9)
     test_date = '2019-06-20'
+    test_layer = 'MODIS_Terra_CorrectedReflectance_TrueColor'
 
     with open(os.path.join(_location_, 'mock_data/tile.jpg'), "rb") as tile_file:
         fake_tile: object = tile_file.read()
 
     requests_mock.get(mock.ANY, content=fake_tile)
 
-    result = GibsAPI().download_wmts_tile_as_geotiff(test_date, test_tile)
+    result = GibsAPI().download_wmts_tile_as_geotiff(test_layer, test_date, test_tile)
 
     expected_meta = {
         'driver': 'GTiff',
@@ -188,8 +189,9 @@ def test_get_merged_image():
     test_tiles = [mercantile.Tile(x=290, y=300, z=9), mercantile.Tile(x=290, y=301, z=9)]
 
     test_date = '2019-06-20'
+    test_layer = 'MODIS_Terra_CorrectedReflectance_TrueColor'
 
-    result_filename = GibsAPI().get_merged_image(test_tiles, test_date,
+    result_filename = GibsAPI().get_merged_image(test_layer, test_tiles, test_date,
                                                  "a8ebbe34-4d63-4eef-8ff4-c69da3ee359d")
 
     expected_meta = {
@@ -206,14 +208,15 @@ def test_get_merged_image():
     with rio.open(str(result_filename)) as dataset:
         assert dataset.meta == expected_meta
 
-
+@pytest.mark.live
 def test_write_quicklook():
 
     test_bbox = (38.671875, 20.632784250388017, 40.078125, 21.943045533438177)
     test_query_date = '2019-01-24'
     test_uuid = '17afe6e1-f10d-43a8-ac16-2a5e3404bc36'
+    test_layer = 'MODIS_Terra_CorrectedReflectance_TrueColor'
 
-    GibsAPI().write_quicklook(test_bbox, test_query_date, test_uuid)
+    GibsAPI().write_quicklook(test_layer, test_bbox, test_query_date, test_uuid)
 
     quicklook_path = "/tmp/quicklooks/%s.jpg" %test_uuid
 
