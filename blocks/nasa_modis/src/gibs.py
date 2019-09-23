@@ -99,12 +99,19 @@ class GibsAPI:
         is_name = True
         has_intersection = True
 
+        invalid_names = []
+        invalid_geom = []
+
         for each_layer in layers:
             is_name = each_layer in available_layers.keys() and is_name
             if is_name:
                 has_intersection = available_layers[each_layer]["WGS84BoundingBox"].intersects(search_geom) and has_intersection
+                if not has_intersection:
+                    invalid_geom += [available_layers[each_layer]["WGS84BoundingBox"].wkt]
+            else:
+                invalid_names += [each_layer]
 
-        return is_name and has_intersection
+        return (is_name and has_intersection), invalid_names, invalid_geom
 
 
     def download_quicklook(self, layer: str, bbox, date: str) -> Response:
