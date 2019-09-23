@@ -284,7 +284,7 @@ def test_aoiclipped_fetcher_fetch_live():
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
 
 @pytest.mark.live
-def test_aoiclipped_fetcher_VIRS_fetch_live():
+def test_aoiclipped_fetcher_virs_fetch_live():
     """
     Unmocked ("live") test for fetching VIIRS data in png
     """
@@ -308,8 +308,8 @@ def test_aoiclipped_fetcher_VIRS_fetch_live():
 
     img_filename = "/tmp/output/%s" % result.features[0]["properties"]["up42.data.aoiclipped"]
     with rio.open(img_filename) as dataset:
-        band2 = dataset.read(2)
-        assert np.sum(band2) == 28360474
+        band1 = dataset.read(1)
+        assert np.sum(band1) == 45230078
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
 
 
