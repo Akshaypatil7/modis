@@ -7,9 +7,11 @@ import os
 import rasterio as rio
 import numpy as np
 import requests_mock as mock
+import pytest
 
 from context import STACQuery, Modis
 
+@pytest.mark.live
 def test_aoiclipped_fetcher_fetch_in_dry_run_mode():
     """
     Test for dry-run mode i.e. only metadata is returned
@@ -67,7 +69,7 @@ def test_aoiclipped_fetcher_fetch(requests_mock):
         assert np.sum(band2) == 7954025
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
 
-
+@pytest.mark.live
 def test_aoiclipped_fetcher_fetch_live():
     """
     Unmocked ("live") test for fetching data
