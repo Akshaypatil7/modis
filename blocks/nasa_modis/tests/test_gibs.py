@@ -53,29 +53,29 @@ def test_validate_layers(requests_mock):
 
     requests_mock.get(mock.ANY, content=fake_xml)
 
-    valid, i_names, i_geom = GibsAPI().validate_layers(['MODIS_Aqua_CorrectedReflectance_TrueColor'],
-                                                       [50, 50, 60, 60])
+    valid, i_names, i_geom, _ = GibsAPI().validate_layers(['MODIS_Aqua_CorrectedReflectance_TrueColor'],
+                                                          [50, 50, 60, 60])
     assert valid
     assert i_names == i_geom == []
 
-    valid, i_names, i_geom = GibsAPI().validate_layers(['ABC'], [50, 50, 60, 60])
+    valid, i_names, i_geom, _ = GibsAPI().validate_layers(['ABC'], [50, 50, 60, 60])
     assert not valid
     assert i_names == ['ABC']
 
-    multiple_valid, i_names, i_geom = GibsAPI().validate_layers(['MODIS_Aqua_CorrectedReflectance_TrueColor',
-                                                                 'MODIS_Terra_CorrectedReflectance_TrueColor'],
-                                                                [50, 50, 60, 60])
+    multiple_valid, i_names, i_geom, _ = GibsAPI().validate_layers(['MODIS_Aqua_CorrectedReflectance_TrueColor',
+                                                                    'MODIS_Terra_CorrectedReflectance_TrueColor'],
+                                                                   [50, 50, 60, 60])
     assert multiple_valid
     assert i_names == i_geom == []
 
-    multiple_valid, i_names, i_geom = GibsAPI().validate_layers(['MODIS_Aqua_CorrectedReflectance_TrueColor',
-                                                                 'MODIS_Terra_CorrectedReflectance_TrueColor',
-                                                                 'ABC'], [50, 50, 60, 60])
+    multiple_valid, i_names, i_geom, _ = GibsAPI().validate_layers(['MODIS_Aqua_CorrectedReflectance_TrueColor',
+                                                                    'MODIS_Terra_CorrectedReflectance_TrueColor',
+                                                                    'ABC'], [50, 50, 60, 60])
     assert not multiple_valid
     assert i_names == ['ABC']
 
-    multiple_geom, i_names, i_geom = GibsAPI().validate_layers(['MODIS_Aqua_CorrectedReflectance_TrueColor'],
-                                                               [200, 200, 210, 210])
+    multiple_geom, i_names, i_geom, _ = GibsAPI().validate_layers(['MODIS_Aqua_CorrectedReflectance_TrueColor'],
+                                                                  [200, 200, 210, 210])
     assert not multiple_geom
     assert i_names == []
     assert i_geom == ['POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))']
