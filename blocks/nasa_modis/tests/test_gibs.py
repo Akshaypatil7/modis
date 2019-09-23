@@ -20,13 +20,30 @@ from context import GibsAPI, extract_query_dates, ensure_data_directories_exist,
 def fixture():
     ensure_data_directories_exist()
 
-def test_get_capabilities():
+@pytest.mark.live
+def test_get_capabilities_live():
     assert GibsAPI().get_capabilities().status_code == 200
 
-def test_get_list_available_layers():
+@pytest.mark.live
+def test_get_list_available_layers_live():
     layers = GibsAPI().get_list_available_layers()
+    print(layers)
     print(len(layers))
-    assert len(layers) >= 872
+    assert len(layers) >= 5
+
+def test_get_list_available_layers(requests_mock):
+    _location_ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+    with open(os.path.join(_location_, 'mock_data/available_layers.xml'), "rb") as xml_file:
+        fake_xml: object = xml_file.read()
+
+    requests_mock.get(mock.ANY, content=fake_xml)
+
+    layers = GibsAPI().get_list_available_layers()
+
+    assert layers['MODIS_Aqua_CorrectedReflectance_TrueColor']['Identifier']\
+           == 'MODIS_Aqua_CorrectedReflectance_TrueColor'
+    assert len(layers) == 45
 
 def test_extract_query_dates():
     """
@@ -134,7 +151,7 @@ def test_download_wmts_tile_as_geotiff(requests_mock):
     with rio.open(result) as dataset:
         assert dataset.meta == expected_meta
 
-
+@pytest.mark.live
 def test_get_merged_image():
     """
     Unmocked ("live") test making sure output images have correct metadata set
