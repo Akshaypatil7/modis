@@ -4,6 +4,9 @@ install:
 test:
 	python -m pytest --pylint --pylint-rcfile=../../pylintrc --mypy --mypy-ignore-missing-imports --cov=src/
 
+test[live]:
+	python -m pytest --pylint --pylint-rcfile=../../pylintrc --mypy --mypy-ignore-missing-imports --cov=src/ --runlive
+
 clean:
 	find . -name "__pycache__" -exec rm -rf {} +
 	find . -name ".mypy_cache" -exec rm -rf {} +
