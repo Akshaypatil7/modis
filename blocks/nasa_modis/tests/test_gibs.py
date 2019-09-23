@@ -53,11 +53,26 @@ def test_validate_layers(requests_mock):
 
     requests_mock.get(mock.ANY, content=fake_xml)
 
-    valid = GibsAPI().validate_layers(['MODIS_Aqua_CorrectedReflectance_TrueColor'], [50, 50, 60, 60])
+    valid = GibsAPI().validate_layers(['MODIS_Aqua_CorrectedReflectance_TrueColor'],
+                                      [50, 50, 60, 60])
     assert valid
 
     valid = GibsAPI().validate_layers(['ABC'], [50, 50, 60, 60])
     assert not valid
+
+    multiple_valid = GibsAPI().validate_layers(['MODIS_Aqua_CorrectedReflectance_TrueColor',
+                                                'MODIS_Terra_CorrectedReflectance_TrueColor'],
+                                               [50, 50, 60, 60])
+    assert multiple_valid
+
+    multiple_valid = GibsAPI().validate_layers(['MODIS_Aqua_CorrectedReflectance_TrueColor',
+                                                'MODIS_Terra_CorrectedReflectance_TrueColor',
+                                                'ABC'], [50, 50, 60, 60])
+    assert not multiple_valid
+
+    multiple_geom = GibsAPI().validate_layers(['MODIS_Aqua_CorrectedReflectance_TrueColor'],
+                                              [200, 200, 210, 210])
+    assert not multiple_geom
 
 def test_extract_query_dates():
     """
