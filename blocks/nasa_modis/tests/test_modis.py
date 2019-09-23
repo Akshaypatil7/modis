@@ -283,6 +283,35 @@ def test_aoiclipped_fetcher_fetch_live():
         assert np.sum(band2) == 28360474
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
 
+@pytest.mark.live
+def test_aoiclipped_fetcher_VIRS_fetch_live():
+    """
+    Unmocked ("live") test for fetching VIIRS data in png
+    """
+
+    query = STACQuery.from_dict({
+        "zoom_level": 9,
+        "time": "2019-01-01T16:40:49+00:00/2019-01-25T16:41:49+00:00",
+        "limit": 2,
+        "bbox": [
+            38.941807150840766,
+            21.288749561718983,
+            39.686130881309516,
+            21.808610762909364
+        ],
+        "layers": ["VIIRS_SNPP_Brightness_Temp_BandI5_Night"]
+    })
+
+    result = Modis.AOIClippedFetcher().fetch(query, dry_run=False)
+
+    assert len(result.features) == 2
+
+    img_filename = "/tmp/output/%s" % result.features[0]["properties"]["up42.data.aoiclipped"]
+    with rio.open(img_filename) as dataset:
+        band2 = dataset.read(2)
+        assert np.sum(band2) == 28360474
+    assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
+
 
 @pytest.mark.live
 def test_aoiclipped_fetcher_multiple_fetch_live():
