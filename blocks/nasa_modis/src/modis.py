@@ -46,23 +46,25 @@ class Modis:
             output_features: List[Feature] = []
 
             date_list = extract_query_dates(query)
+            layer_list = query.layers
 
-            for query_date in date_list:
+            for layer in layer_list:
+                for query_date in date_list:
 
-                feature_id: str = str(uuid.uuid4())
-                return_poly = unary_union([box(*tuple(mercantile.bounds(bbox))) for bbox in tile_list])
-                feature = Feature(id=feature_id,
-                                  bbox=return_poly.bounds,
-                                  geometry=return_poly)
+                    feature_id: str = str(uuid.uuid4())
+                    return_poly = unary_union([box(*tuple(mercantile.bounds(bbox))) for bbox in tile_list])
+                    feature = Feature(id=feature_id,
+                                      bbox=return_poly.bounds,
+                                      geometry=return_poly)
 
-                self.api.write_quicklook(return_poly.bounds, query_date, feature_id)
+                    self.api.write_quicklook(layer, return_poly.bounds, query_date, feature_id)
 
-                if not dry_run:
-                    # Fetch tiles and patch them together
-                    self.api.get_merged_image(tile_list, query_date, feature_id)
-                    feature["properties"]["up42.data.aoiclipped"] = "%s.tif" % feature_id
+                    if not dry_run:
+                        # Fetch tiles and patch them together
+                        self.api.get_merged_image(layer, tile_list, query_date, feature_id)
+                        feature["properties"]["up42.data.aoiclipped"] = "%s.tif" % feature_id
 
-                logger.debug(feature)
-                output_features.append(feature)
+                    logger.debug(feature)
+                    output_features.append(feature)
 
             return FeatureCollection(list(output_features))

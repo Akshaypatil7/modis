@@ -26,7 +26,8 @@ def test_aoiclipped_fetcher_fetch_in_dry_run_mode():
             -10.188159969024264,
             123.70257586240771,
             -10.113232998848046
-        ]
+        ],
+        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]
     })
 
     result = Modis.AOIClippedFetcher().fetch(query, dry_run=True)
@@ -56,7 +57,8 @@ def test_aoiclipped_fetcher_fetch(requests_mock):
             -10.188159969024264,
             123.70257586240771,
             -10.113232998848046
-        ]
+        ],
+        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]
     })
 
     result = Modis.AOIClippedFetcher().fetch(query, dry_run=False)
@@ -84,7 +86,8 @@ def test_aoiclipped_fetcher_fetch_live():
             21.288749561718983,
             39.686130881309516,
             21.808610762909364
-        ]
+        ],
+        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]
     })
 
     result = Modis.AOIClippedFetcher().fetch(query, dry_run=False)
