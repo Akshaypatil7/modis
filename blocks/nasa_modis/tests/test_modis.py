@@ -1,8 +1,10 @@
 """
 Integration tests for the higher-level fetch methods
 """
-
+# pylint: disable=unused-import
+# requests_mock used as fixture in tests
 import os
+import re
 
 import rasterio as rio
 import numpy as np
@@ -46,7 +48,18 @@ def test_aoiclipped_fetcher_fetch(requests_mock):
                                                os.path.dirname(__file__)))
     with open(os.path.join(_location_, 'mock_data/tile.jpg'), "rb") as tile_file:
         mock_image: object = tile_file.read()
-    requests_mock.get(mock.ANY, content=mock_image)
+
+    with open(os.path.join(_location_, 'mock_data/available_layers.xml'), "rb") as xml_file:
+        mock_xml: object = xml_file.read()
+
+    matcher_wms = re.compile('https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?')
+    matcher_wmts = re.compile('https://gibs.earthdata.nasa.gov/wmts/epsg3857/'
+                              'best/MODIS_Terra_CorrectedReflectance_TrueColor/')
+    matcher_get_capabilities = re.compile('WMTSCapabilities.xml')
+
+    requests_mock.get(matcher_get_capabilities, content=mock_xml)
+    requests_mock.get(matcher_wms, content=mock_image)
+    requests_mock.get(matcher_wmts, content=mock_image)
 
     query = STACQuery.from_dict({
         "zoom_level": 9,
