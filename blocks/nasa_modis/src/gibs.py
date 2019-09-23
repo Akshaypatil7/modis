@@ -12,8 +12,8 @@ import requests
 from requests import Response
 import mercantile
 import rasterio as rio
-
 from rasterio.merge import merge
+from shapely.geometry import box
 
 from blockutils.logging import get_logger
 from blockutils.stac import STACQuery
@@ -58,11 +58,13 @@ def extract_query_dates(query: STACQuery) -> list:
             date_list = [date_points[0].strftime('%Y-%m-%d')]
     return date_list
 
-
+# pylint: disable=line-too-long
+# Long URL and XML identifiers
 class GibsAPI:
 
     def __init__(self):
         self.wmts_url = "https://gibs.earthdata.nasa.gov/wmts"
+        self.get_capabilities_url = "/epsg3857/best/1.0.0/WMTSCapabilities.xml"
         self.wmts_endpoint = "/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default" + \
                              "/{date}/GoogleMapsCompatible_Level9/{zoom}/{y}/{x}.jpg"
         self.wms_url = "https://gibs.earthdata.nasa.gov/wms"
@@ -71,17 +73,23 @@ class GibsAPI:
         self.quicklook_size = 512, 512
 
     def get_capabilities(self) -> Response:
-        url = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?SERVICE=WMTS&request=GetCapabilities"
+        url = self.wmts_url + self.get_capabilities_url
         response = requests.request("GET", url)
         return response
 
     def get_list_available_layers(self):
         capabilities = ET.fromstring(self.get_capabilities().content)
-        layers = []
-        for layer in list(capabilities[3]):
-            l = (layer.find("{http://www.opengis.net/ows/1.1}Identifier").text,
-            layer.find("{http://www.opengis.net/wmts/1.0}TileMatrixSetLink/{http://www.opengis.net/wmts/1.0}TileMatrixSet").text)
-            layers += [l]
+        layers = {}
+        for layer in capabilities[3].findall("{http://www.opengis.net/wmts/1.0}Layer"):
+            extent_lc = layer.find("{http://www.opengis.net/ows/1.1}WGS84BoundingBox").find("{http://www.opengis.net/ows/1.1}LowerCorner").text
+            extent_uc = layer.find("{http://www.opengis.net/ows/1.1}WGS84BoundingBox").find("{http://www.opengis.net/ows/1.1}UpperCorner").text
+            coords = [float(i) for i in extent_lc.split(' ')+extent_uc.split(' ')]
+            extent_bbox = box(*coords)
+            candidate = {"Identifier": layer.find("{http://www.opengis.net/ows/1.1}Identifier").text,
+                         "TileMatrixSet": layer.find("{http://www.opengis.net/wmts/1.0}TileMatrixSetLink").find("{http://www.opengis.net/wmts/1.0}TileMatrixSet").text,
+                         "WGS84BoundingBox": extent_bbox}
+            if candidate["TileMatrixSet"] == "GoogleMapsCompatible_Level9":
+                layers[candidate["Identifier"]] = candidate
         return layers
 
     def download_quicklook(self, bbox, date: str) -> Response:
