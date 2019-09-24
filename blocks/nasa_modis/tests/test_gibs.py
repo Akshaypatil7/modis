@@ -195,7 +195,11 @@ def test_get_merged_image():
     test_tiles = [mercantile.Tile(x=290, y=300, z=9), mercantile.Tile(x=290, y=301, z=9)]
 
     test_date = '2019-06-20'
-    test_layer = 'MODIS_Terra_CorrectedReflectance_TrueColor'
+    test_layer = {"MODIS_Terra_CorrectedReflectance_TrueColor":{
+                  "Identifier": "MODIS_Terra_CorrectedReflectance_TrueColor",
+                  "TileMatrixSet": "GoogleMapsCompatible_Level9",
+                  "WGS84BoundingBox": "shapely.geometry.polygon.Polygon object at 0x130e71590",
+                  "Format": "jpeg"}}
 
     result_filename = GibsAPI().get_merged_image(test_layer, test_tiles, test_date,
                                                  "a8ebbe34-4d63-4eef-8ff4-c69da3ee359d")
