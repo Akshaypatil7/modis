@@ -12,6 +12,7 @@ import requests
 from requests import Response
 import mercantile
 import rasterio as rio
+import numpy as np
 from rasterio.merge import merge
 from shapely.geometry import box
 
@@ -214,24 +215,34 @@ class GibsAPI:
         """
 
         img_files = []
+
         logger.info("Downloading tiles")
         for layer in layers:
+            logger.info("Getting %s", layer)
             for tile in tiles:
                 tiff_file = self.download_wmts_tile_as_geotiff(layer, date, tile, layers[layer]['Format'])
                 img_files.append(rio.open(tiff_file.name, driver="GTiff"))
                 # Now merge the images
-                out_ar, out_trans = merge(img_files)
+            out_ar, out_trans = merge(img_files)
+            layers[layer]['out_ar'] = out_ar
+            layers[layer]['out_trans'] = out_trans
+            layers[layer]['out_ar_shape'] = out_ar.shape
 
-                merged_img_meta = img_files[0].meta.copy()
-                merged_img_meta.update({
-                    "transform": out_trans,
-                    "height": out_ar.shape[1],
-                    "width": out_ar.shape[2],
-                })
+            logger.info("Layer %s added!", layer)
+
+        out_all = np.concatenate([layers[k]['out_ar'] for k in layers])
+
+        merged_img_meta = img_files[0].meta.copy()
+        merged_img_meta.update({
+            "transform": out_trans,
+            "height": out_all.shape[1],
+            "width": out_all.shape[2],
+            "count": out_all.shape[0]
+        })
 
         img_filename = "/tmp/output/%s.tif" % str(output_uuid)
 
         with rio.open(img_filename, "w", **merged_img_meta) as dataset:
-            dataset.write(out_ar)
+            dataset.write(out_all)
 
         return Path(img_filename)
