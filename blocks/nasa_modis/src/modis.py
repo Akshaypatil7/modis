@@ -58,9 +58,8 @@ class Modis:
                 raise ValueError("Invalid Layers. %r have invalid names."
                                  "%r are layer bounds, search should be within this." % (invalid_names, invalid_geom))
 
-            for layer in valid_layers:
-                for query_date in date_list:
-
+            for query_date in date_list:
+                for layer in valid_layers:
                     feature_id: str = str(uuid.uuid4())
                     return_poly = unary_union([box(*tuple(mercantile.bounds(bbox))) for bbox in tile_list])
                     feature = Feature(id=feature_id,
@@ -69,12 +68,11 @@ class Modis:
 
                     self.api.write_quicklook(layer, return_poly.bounds, query_date, feature_id)
 
-                    if not dry_run:
-                        # Fetch tiles and patch them together
-                        self.api.get_merged_image(layer, tile_list, query_date,
-                                                  feature_id,
-                                                  img_format=valid_layers[layer]['Format'])
-                        feature["properties"]["up42.data.aoiclipped"] = "%s.tif" % feature_id
+                if not dry_run:
+                    # Fetch tiles and patch them together
+                    self.api.get_merged_image(valid_layers, tile_list, query_date,
+                                              feature_id)
+                    feature["properties"]["up42.data.aoiclipped"] = "%s.tif" % feature_id
 
                     logger.debug(feature)
                     output_features.append(feature)
