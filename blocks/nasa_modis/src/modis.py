@@ -74,7 +74,7 @@ class Modis:
                                               feature_id)
                     feature["properties"]["up42.data.aoiclipped"] = "%s.tif" % feature_id
 
-                    logger.debug(feature)
-                    output_features.append(feature)
+                logger.debug(feature)
+                output_features.append(feature)
 
             return FeatureCollection(list(output_features))
