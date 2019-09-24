@@ -62,7 +62,7 @@ def test_aoiclipped_fetcher_multiple_fetch_in_dry_run_mode():
 
     result = Modis.AOIClippedFetcher().fetch(query, dry_run=True)
 
-    assert len(result.features) == 2
+    assert len(result.features) == 1
     assert "up42.data.aoiclipped" not in result.features[0]["properties"].keys()
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
 
@@ -335,12 +335,13 @@ def test_aoiclipped_fetcher_multiple_fetch_live():
 
     result = Modis.AOIClippedFetcher().fetch(query, dry_run=False)
 
-    assert len(result.features) == 4
+    assert len(result.features) == 2
 
     img_filename = "/tmp/output/%s" % result.features[0]["properties"]["up42.data.aoiclipped"]
     with rio.open(img_filename) as dataset:
         band2 = dataset.read(2)
         assert np.sum(band2) == 28360474
+        assert dataset.count == 6
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
 
 
