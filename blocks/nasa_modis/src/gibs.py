@@ -208,25 +208,26 @@ class GibsAPI:
 
     # pylint: disable=too-many-arguments
     # Merged image requires all args, TODO
-    def get_merged_image(self, layer: str, tiles: list, date: str, output_uuid: str, img_format: str = "jpg") -> Path:
+    def get_merged_image(self, layers: dict, tiles: list, date: str, output_uuid: str) -> Path:
         """
         Fetches all tiles for one date, merges them and returns a GeoTIFF
         """
 
         img_files = []
         logger.info("Downloading tiles")
-        for tile in tiles:
-            tiff_file = self.download_wmts_tile_as_geotiff(layer, date, tile, img_format)
-            img_files.append(rio.open(tiff_file.name, driver="GTiff"))
-        # Now merge the images
-        out_ar, out_trans = merge(img_files)
+        for layer in layers:
+            for tile in tiles:
+                tiff_file = self.download_wmts_tile_as_geotiff(layer, date, tile, layers[layer]['Format'])
+                img_files.append(rio.open(tiff_file.name, driver="GTiff"))
+                # Now merge the images
+                out_ar, out_trans = merge(img_files)
 
-        merged_img_meta = img_files[0].meta.copy()
-        merged_img_meta.update({
-            "transform": out_trans,
-            "height": out_ar.shape[1],
-            "width": out_ar.shape[2],
-        })
+                merged_img_meta = img_files[0].meta.copy()
+                merged_img_meta.update({
+                    "transform": out_trans,
+                    "height": out_ar.shape[1],
+                    "width": out_ar.shape[2],
+                })
 
         img_filename = "/tmp/output/%s.tif" % str(output_uuid)
 
