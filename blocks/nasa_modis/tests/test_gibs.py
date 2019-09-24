@@ -219,6 +219,35 @@ def test_get_merged_image():
         assert dataset.meta == expected_meta
 
 @pytest.mark.live
+def test_get_multiple_merged_image():
+    """
+    Unmocked ("live") test with multiple layers making sure output images have
+    correct metadata set
+    """
+    test_tiles = [mercantile.Tile(x=290, y=300, z=9), mercantile.Tile(x=290, y=301, z=9)]
+
+    test_date = '2019-06-20'
+    test_layers = {'MODIS_Terra_CorrectedReflectance_TrueColor':{'Identifier': 'MODIS_Terra_CorrectedReflectance_TrueColor',"Format": "jpeg"}, 'MODIS_Aqua_CorrectedReflectance_TrueColor':{'Identifier': 'MODIS_Aqua_CorrectedReflectance_TrueColor',"Format": "jpeg"}}
+
+    result_filename = GibsAPI().get_merged_image(test_layers, test_tiles, test_date,
+                                                 "a8ebbe34-4d63-4eef-8ff4-c69da3ee359d")
+
+    expected_meta = {
+        'driver': 'GTiff',
+        'dtype': 'uint8',
+        'nodata': None,
+        'width': 256,
+        'height': 512,
+        'count': 6,
+        'crs': CRS.from_dict(init='epsg:3857'),
+        'transform': Affine(305.74811314070394, 0.0, 2661231.5767766964,
+                            0.0, -305.7481131407094, -3443946.746416901)}
+
+    with rio.open(str(result_filename)) as dataset:
+        assert dataset.meta == expected_meta
+
+
+@pytest.mark.live
 def test_write_quicklook():
 
     test_bbox = (38.671875, 20.632784250388017, 40.078125, 21.943045533438177)
