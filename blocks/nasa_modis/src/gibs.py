@@ -76,8 +76,6 @@ def make_list_layer_band(layers, count):
     return out_list
 
 
-# pylint: disable=line-too-long
-# Long URL and XML identifiers
 class GibsAPI:
 
     def __init__(self):
@@ -95,7 +93,7 @@ class GibsAPI:
         response = requests.request("GET", url)
         return response
 
-    def get_list_available_layers(self):
+    def get_dict_available_layers(self):
         capabilities = ET.fromstring(self.get_capabilities().content)
         layers = {}
         for layer in capabilities[3].findall("{http://www.opengis.net/wmts/1.0}Layer"):
@@ -111,7 +109,7 @@ class GibsAPI:
         return layers
 
     def validate_layers(self, layers, bbox):
-        available_layers = self.get_list_available_layers()
+        available_layers = self.get_dict_available_layers()
         search_geom = box(*bbox)
 
         is_name = True
@@ -187,7 +185,6 @@ class GibsAPI:
                     ql_file.write(chunk)
 
     def download_wmts_tile_as_geotiff(self, layer: str, date: str, tile: mercantile.Tile, img_format: str = "jpg") -> IO[Any]:
-        # pylint: disable=too-many-locals
         tile_url = self.wmts_url + self.wmts_endpoint.format(layer=layer,
                                                              date=date,
                                                              x=tile.x,
@@ -224,8 +221,7 @@ class GibsAPI:
 
         return tmp_file
 
-    # pylint: disable=too-many-locals
-    # Merged image requires all args, TODO
+
     def get_merged_image(self, layers: dict, tiles: list, date: str, output_uuid: str) -> Path:
         """
         Fetches all tiles for one date, merges them and returns a GeoTIFF

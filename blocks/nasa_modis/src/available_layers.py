@@ -3,7 +3,7 @@ import json
 from gibs import GibsAPI
 
 def run():
-    layers = GibsAPI().get_list_available_layers()
+    layers = GibsAPI().get_dict_available_layers()
     for layer in layers:
         layers[layer]['WGS84BoundingBox'] = layers[layer]['WGS84BoundingBox'].wkt
 

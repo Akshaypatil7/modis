@@ -28,14 +28,14 @@ def test_get_capabilities_live():
 
 
 @pytest.mark.live
-def test_get_list_available_layers_live():
-    layers = GibsAPI().get_list_available_layers()
+def test_get_dict_available_layers_live():
+    layers = GibsAPI().get_dict_available_layers()
     print(layers)
     print(len(layers))
     assert len(layers) >= 5
 
 
-def test_get_list_available_layers(requests_mock):
+def test_get_dict_available_layers(requests_mock):
     _location_ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
     with open(os.path.join(_location_, 'mock_data/available_layers.xml'), "rb") as xml_file:
@@ -43,7 +43,7 @@ def test_get_list_available_layers(requests_mock):
 
     requests_mock.get(mock.ANY, content=fake_xml)
 
-    layers = GibsAPI().get_list_available_layers()
+    layers = GibsAPI().get_dict_available_layers()
 
     assert layers['MODIS_Aqua_CorrectedReflectance_TrueColor']['Identifier']\
            == 'MODIS_Aqua_CorrectedReflectance_TrueColor'
