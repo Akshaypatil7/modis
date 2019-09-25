@@ -5,6 +5,7 @@ import datetime
 from datetime import timedelta
 import xml.etree.ElementTree as ET
 from pathlib import Path
+import collections
 
 
 from dateutil import parser
@@ -103,7 +104,7 @@ class GibsAPI:
         invalid_names = []
         invalid_geom = []
 
-        valid_layers = {}
+        valid_layers = collections.OrderedDict()
 
         for each_layer in layers:
             is_name = each_layer in available_layers.keys() and is_name
