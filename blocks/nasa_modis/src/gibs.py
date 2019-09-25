@@ -1,4 +1,4 @@
-from typing import IO, Any
+from typing import IO, Any, List
 from io import BytesIO
 import tempfile
 import datetime
@@ -61,10 +61,17 @@ def extract_query_dates(query: STACQuery) -> list:
     return date_list
 
 
-def make_list_layer_band(layers, count):
-    out_list = []
-    band_order = []
-    layer_names = []
+def make_list_layer_band(layers: collections.OrderedDict, count: int) -> List:
+    """
+    Makes list of all output bands and their respective provenance.
+
+    :param layers: All layers included in output file and attributes
+    :param count: The count of all bands in output file
+    :return: A list output bands and their provenance
+    """
+    out_list: List[List] = []
+    band_order: List[int] = []
+    layer_names: List[str] = []
     for layer in layers:
         layer_names += [layer] * (layers[layer]['out_ar_shape'][0])
         band_order += list(range(1, layers[layer]['out_ar_shape'][0]+1))
@@ -222,7 +229,7 @@ class GibsAPI:
         return tmp_file
 
 
-    def get_merged_image(self, layers: dict, tiles: list, date: str, output_uuid: str) -> Path:
+    def get_merged_image(self, layers: collections.OrderedDict, tiles: list, date: str, output_uuid: str) -> Path:
         """
         Fetches all tiles for one date, merges them and returns a GeoTIFF
         """
