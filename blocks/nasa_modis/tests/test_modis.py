@@ -310,6 +310,8 @@ def test_aoiclipped_fetcher_virs_fetch_live():
     with rio.open(img_filename) as dataset:
         band1 = dataset.read(1)
         assert np.sum(band1) == 45230078
+        assert dataset.count == 1
+    assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
 
 
