@@ -260,20 +260,18 @@ class GibsAPI:
             for tile in tiles:
                 tiff_file = self.download_wmts_tile_as_geotiff(layer, date, tile, layers[layer]['Format'])
                 img_files.append(rio.open(tiff_file.name, driver="GTiff"))
-                # Now merge the images
-            out_ar, out_trans = merge(img_files)
-            layers[layer]['out_ar'] = out_ar
-            layers[layer]['out_trans'] = out_trans
-            layers[layer]['out_ar_shape'] = out_ar.shape
+            # Now merge the images
+            layers[layer]['out_ar'], layers[layer]['out_trans'] = merge(img_files)
+            layers[layer]['out_ar_shape'] = layers[layer]['out_ar'].shape
 
-            logger.info("Shape of layer is %r", out_ar.shape)
+            logger.info("Shape of layer is %r", layers[layer]['out_ar'].shape)
             logger.info("Layer %s added!", layer)
 
         out_all = np.concatenate([layers[k]['out_ar'] for k in layers])
 
         merged_img_meta = img_files[0].meta.copy()
         merged_img_meta.update({
-            "transform": out_trans,
+            "transform": layers[list(layers.keys())[0]]['out_trans'],
             "height": out_all.shape[1],
             "width": out_all.shape[2],
             "count": out_all.shape[0]
