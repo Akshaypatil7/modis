@@ -3,6 +3,7 @@ Unit tests for all methods in the Gibs module i.e. internal logic and API intera
 """
 
 import os
+import collections
 
 import pytest
 import mercantile
@@ -13,7 +14,7 @@ from PIL import Image
 
 import requests_mock as mock
 
-from context import GibsAPI, extract_query_dates, ensure_data_directories_exist, STACQuery
+from context import GibsAPI, extract_query_dates, ensure_data_directories_exist, STACQuery, make_list_layer_band
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -170,6 +171,30 @@ def test_extract_query_dates():
 
     date_list = extract_query_dates(query)
     assert date_list == ['2019-04-25']
+
+
+def test_make_list_layer_band():
+    test_layers = collections.OrderedDict({
+        'MODIS_Terra_CorrectedReflectance_TrueColor':
+            {
+                'Identifier': 'MODIS_Terra_CorrectedReflectance_TrueColor',
+                "Format": "jpeg",
+                "out_ar_shape": (3, 5, 5)
+            },
+        'MODIS_Aqua_CorrectedReflectance_TrueColor':
+            {
+                'Identifier': 'MODIS_Aqua_CorrectedReflectance_TrueColor',
+                "Format": "jpeg",
+                "out_ar_shape": (3, 5, 5)
+            }
+    })
+
+    test_count = 6
+    list_layers = make_list_layer_band(test_layers, test_count)
+    assert len(list_layers) == 6
+    assert list_layers[0] == [1, 'MODIS_Terra_CorrectedReflectance_TrueColor', 1]
+    assert list_layers[1] == [2, 'MODIS_Terra_CorrectedReflectance_TrueColor', 2]
+    assert list_layers[3] == [4, 'MODIS_Aqua_CorrectedReflectance_TrueColor', 1]
 
 
 def test_download_wmts_tile_as_geotiff(requests_mock):
