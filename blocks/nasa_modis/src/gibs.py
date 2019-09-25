@@ -60,6 +60,22 @@ def extract_query_dates(query: STACQuery) -> list:
             date_list = [date_points[0].strftime('%Y-%m-%d')]
     return date_list
 
+
+def make_list_layer_band(layers, count):
+    out_list = []
+    band_order = []
+    layer_names = []
+    for layer in layers:
+        layer_names += [layer] * (layers[layer]['out_ar_shape'][0])
+        band_order += list(range(1, layers[layer]['out_ar_shape'][0]+1))
+
+    for band_number in range(1, count+1):
+        layer_name = layer_names[band_number-1]
+        layer_band = band_order[band_number-1]
+        out_list += [[band_number, layer_name, layer_band]]
+    return out_list
+
+
 # pylint: disable=line-too-long
 # Long URL and XML identifiers
 class GibsAPI:
@@ -241,9 +257,12 @@ class GibsAPI:
             "count": out_all.shape[0]
         })
 
+
         img_filename = "/tmp/output/%s.tif" % str(output_uuid)
 
         with rio.open(img_filename, "w", **merged_img_meta) as dataset:
+            for band in make_list_layer_band(layers, out_all.shape[0]):
+                dataset.update_tags(band[0], layer=band[1], band=band[2])
             dataset.write(out_all)
 
         return Path(img_filename)
