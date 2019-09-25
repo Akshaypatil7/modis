@@ -215,10 +215,9 @@ class GibsAPI:
         Fetches all tiles for one date, merges them and returns a GeoTIFF
         """
 
-        img_files = []
-
         logger.info("Downloading tiles")
         for layer in layers:
+            img_files = []
             logger.info("Getting %s", layer)
             for tile in tiles:
                 tiff_file = self.download_wmts_tile_as_geotiff(layer, date, tile, layers[layer]['Format'])
@@ -229,6 +228,7 @@ class GibsAPI:
             layers[layer]['out_trans'] = out_trans
             layers[layer]['out_ar_shape'] = out_ar.shape
 
+            logger.info("Shape of layer is %r", out_ar.shape)
             logger.info("Layer %s added!", layer)
 
         out_all = np.concatenate([layers[k]['out_ar'] for k in layers])
