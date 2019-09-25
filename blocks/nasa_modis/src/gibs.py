@@ -1,4 +1,4 @@
-from typing import IO, Any, List
+from typing import IO, Any, List, Tuple
 from io import BytesIO
 import tempfile
 import datetime
@@ -96,11 +96,19 @@ class GibsAPI:
         self.quicklook_size = 512, 512
 
     def get_capabilities(self) -> Response:
+        """
+        Get capabilities from WMTS service
+        """
         url = self.wmts_url + self.get_capabilities_url
         response = requests.request("GET", url)
         return response
 
     def get_dict_available_layers(self):
+        """
+        Get a dictionary of all suitable layers (with TileMatrixSet ==
+        GoogleMapsCompatible_Level9) and output a dict with relevant attributes:
+        Identifier, TileMatrixSet, WGS84BoundingBox and Format
+        """
         capabilities = ET.fromstring(self.get_capabilities().content)
         layers = {}
         for layer in capabilities[3].findall("{http://www.opengis.net/wmts/1.0}Layer"):
@@ -115,17 +123,26 @@ class GibsAPI:
                 layers[candidate["Identifier"]] = candidate
         return layers
 
-    def validate_layers(self, layers, bbox):
+    def validate_layers(self,
+                        layers: collections.OrderedDict,
+                        bbox: List[float]) -> Tuple[bool,
+                                                    Tuple,
+                                                    collections.OrderedDict]:
+        """
+        Get a dictionary of all suitable layers (with TileMatrixSet ==
+        GoogleMapsCompatible_Level9) and output a dict with relevant attributes:
+        Identifier, TileMatrixSet, WGS84BoundingBox and Format
+        """
         available_layers = self.get_dict_available_layers()
         search_geom = box(*bbox)
 
         is_name = True
         has_intersection = True
 
-        invalid_names = []
-        invalid_geom = []
+        invalid_names: List[str] = []
+        invalid_geom: List[str] = []
 
-        valid_layers = collections.OrderedDict()
+        valid_layers: collections.OrderedDict = collections.OrderedDict()
 
         for each_layer in layers:
             is_name = each_layer in available_layers.keys() and is_name
