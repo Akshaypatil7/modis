@@ -147,7 +147,9 @@ class GibsAPI:
         for each_layer in layers:
             is_name = each_layer in available_layers.keys() and is_name
             if is_name:
-                has_intersection = available_layers[each_layer]["WGS84BoundingBox"].intersects(search_geom) and has_intersection
+                has_intersection =\
+                available_layers[each_layer]["WGS84BoundingBox"].intersects(search_geom)\
+                    and has_intersection
                 if not has_intersection:
                     invalid_geom += [available_layers[each_layer]["WGS84BoundingBox"].wkt]
                 else:
@@ -210,7 +212,9 @@ class GibsAPI:
 
     # pylint: disable=too-many-locals
     # Number of variables required to fetch the tiles
-    def download_wmts_tile_as_geotiff(self, layer: str, date: str, tile: mercantile.Tile, img_format: str = "jpg") -> IO[Any]:
+    def download_wmts_tile_as_geotiff(self, layer: str,
+                                      date: str, tile: mercantile.Tile,
+                                      img_format: str = "jpg") -> IO[Any]:
         tile_url = self.wmts_url + self.wmts_endpoint.format(layer=layer,
                                                              date=date,
                                                              x=tile.x,
