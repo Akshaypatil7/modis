@@ -312,6 +312,42 @@ def test_aoiclipped_fetcher_virs_fetch_live():
         assert np.sum(band1) == 45230078
         assert dataset.count == 1
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
+
+def test_aoiclipped_fetcher_rio_tags_fetch_live():
+    """
+    Unmocked ("live") test for fetching MODIS and VIRS data with tags
+    """
+
+    query = STACQuery.from_dict({
+        "zoom_level": 9,
+        "time": "2019-01-01T16:40:49+00:00/2019-01-25T16:41:49+00:00",
+        "limit": 2,
+        "bbox": [
+            38.941807150840766,
+            21.288749561718983,
+            39.686130881309516,
+            21.808610762909364
+        ],
+        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor",
+                   "VIIRS_SNPP_Brightness_Temp_BandI5_Night"]
+    })
+
+    result = Modis.AOIClippedFetcher().fetch(query, dry_run=False)
+
+    assert len(result.features) == 2
+
+    img_filename = "/tmp/output/%s" % result.features[0]["properties"]["up42.data.aoiclipped"]
+    with rio.open(img_filename) as dataset:
+        assert dataset.count == 4
+        band1 = dataset.read(1)
+        assert np.sum(band1) == 29581152
+
+        assert dataset.tags(1)['layer'] == "MODIS_Terra_CorrectedReflectance_TrueColor"
+        assert dataset.tags(1)['band'] == 1
+
+        assert dataset.tags(4)['layer'] == "VIIRS_SNPP_Brightness_Temp_BandI5_Night"
+        assert dataset.tags(4)['band'] == 1
+
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
 
 
