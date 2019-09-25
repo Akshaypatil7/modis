@@ -12,8 +12,8 @@ import requests
 from requests import Response
 import mercantile
 import rasterio as rio
-import numpy as np
 from rasterio.merge import merge
+import numpy as np
 from shapely.geometry import box
 
 from blockutils.logging import get_logger
