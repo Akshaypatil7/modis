@@ -208,6 +208,8 @@ class GibsAPI:
                 if chunk:
                     ql_file.write(chunk)
 
+    # pylint: disable=too-many-locals
+    # Number of variables required to fetch the tiles
     def download_wmts_tile_as_geotiff(self, layer: str, date: str, tile: mercantile.Tile, img_format: str = "jpg") -> IO[Any]:
         tile_url = self.wmts_url + self.wmts_endpoint.format(layer=layer,
                                                              date=date,
