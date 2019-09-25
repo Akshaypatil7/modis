@@ -3,7 +3,6 @@ from io import BytesIO
 import tempfile
 import datetime
 from datetime import timedelta
-import xml.etree.ElementTree as ET
 from pathlib import Path
 import collections
 
@@ -16,6 +15,7 @@ import rasterio as rio
 from rasterio.merge import merge
 import numpy as np
 from shapely.geometry import box
+import xmltodict
 
 from blockutils.logging import get_logger
 from blockutils.stac import STACQuery
@@ -103,22 +103,23 @@ class GibsAPI:
         response = requests.request("GET", url)
         return response
 
-    def get_dict_available_layers(self):
+    def get_dict_available_layers(self) -> dict:
         """
         Get a dictionary of all suitable layers (with TileMatrixSet ==
         GoogleMapsCompatible_Level9) and output a dict with relevant attributes:
         Identifier, TileMatrixSet, WGS84BoundingBox and Format
         """
-        capabilities = ET.fromstring(self.get_capabilities().content)
+        capabilities = xmltodict.parse(self.get_capabilities().text)
         layers = {}
-        for layer in capabilities[3].findall("{http://www.opengis.net/wmts/1.0}Layer"):
-            extent_lc = layer.find("{http://www.opengis.net/ows/1.1}WGS84BoundingBox").find("{http://www.opengis.net/ows/1.1}LowerCorner").text
-            extent_uc = layer.find("{http://www.opengis.net/ows/1.1}WGS84BoundingBox").find("{http://www.opengis.net/ows/1.1}UpperCorner").text
+        for layer in capabilities['Capabilities']['Contents']['Layer']:
+            extent_lc = layer['ows:WGS84BoundingBox']['ows:LowerCorner']
+            extent_uc = layer['ows:WGS84BoundingBox']['ows:UpperCorner']
             coords = [float(i) for i in extent_lc.split(' ')+extent_uc.split(' ')]
             extent_bbox = box(*coords)
-            candidate = {"Identifier": layer.find("{http://www.opengis.net/ows/1.1}Identifier").text,
-                         "TileMatrixSet": layer.find("{http://www.opengis.net/wmts/1.0}TileMatrixSetLink").find("{http://www.opengis.net/wmts/1.0}TileMatrixSet").text,
-                         "WGS84BoundingBox": extent_bbox, "Format": layer.find("{http://www.opengis.net/wmts/1.0}Format").text.split("/")[1]}
+            candidate = {"Identifier": layer['ows:Identifier'],
+                         "TileMatrixSet": layer['TileMatrixSetLink']['TileMatrixSet'],
+                         "WGS84BoundingBox": extent_bbox,
+                         "Format": layer['Format'].split("/")[1]}
             if candidate["TileMatrixSet"] == "GoogleMapsCompatible_Level9":
                 layers[candidate["Identifier"]] = candidate
         return layers

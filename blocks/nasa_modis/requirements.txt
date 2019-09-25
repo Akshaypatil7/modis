@@ -10,5 +10,4 @@ pytest-cov
 pytest-pylint
 requests-mock
 Pillow
-
-
+xmltodict
