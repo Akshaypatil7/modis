@@ -208,7 +208,7 @@ class GibsAPI:
 
         return tmp_file
 
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-locals
     # Merged image requires all args, TODO
     def get_merged_image(self, layers: dict, tiles: list, date: str, output_uuid: str) -> Path:
         """
