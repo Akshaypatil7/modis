@@ -343,10 +343,10 @@ def test_aoiclipped_fetcher_rio_tags_fetch_live():
         assert np.sum(band1) == 29581152
 
         assert dataset.tags(1)['layer'] == "MODIS_Terra_CorrectedReflectance_TrueColor"
-        assert dataset.tags(1)['band'] == 1
+        assert dataset.tags(1)['band'] == str(1)
 
         assert dataset.tags(4)['layer'] == "VIIRS_SNPP_Brightness_Temp_BandI5_Night"
-        assert dataset.tags(4)['band'] == 1
+        assert dataset.tags(4)['band'] == str(1)
 
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]['id'])
 
