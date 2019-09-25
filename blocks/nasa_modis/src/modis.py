@@ -52,11 +52,18 @@ class Modis:
 
             logger.debug("Checking layer %r", layer_list)
             are_valid, invalid_names, invalid_geom, valid_layers = self.api.validate_layers(layer_list, query.bounds())
+            logger.debug("Checking layer %r", query.layers)
+            are_valid, invalid, valid_layers = self.api.validate_layers(
+                query.layers, query.bounds()
+            )
             if are_valid:
-                logger.debug("Layers %r OK!", layer_list)
+                logger.debug("Layers %r OK!", query.layers)
             else:
-                raise ValueError("Invalid Layers. %r have invalid names."
-                                 "%r are layer bounds, search should be within this." % (invalid_names, invalid_geom))
+                raise ValueError(
+                    "Invalid Layers. %r have invalid names."
+                    "%r are layer bounds, search should be within this." %
+                    invalid
+                )
 
             for query_date in date_list:
                 for layer in valid_layers:

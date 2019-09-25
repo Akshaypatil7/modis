@@ -133,7 +133,7 @@ class GibsAPI:
             else:
                 invalid_names += [each_layer]
 
-        return (is_name and has_intersection), invalid_names, invalid_geom, valid_layers
+        return (is_name and has_intersection), (invalid_names, invalid_geom), valid_layers
 
 
     def download_quicklook(self, layer: str, bbox, date: str) -> Response:
