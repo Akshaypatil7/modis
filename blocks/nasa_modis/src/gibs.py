@@ -274,19 +274,21 @@ class GibsAPI:
 
         out_all = np.concatenate([layers[k]['out_ar'] for k in layers])
 
+        out_all_shape = tuple(out_all.shape)
+
         merged_img_meta = img_files[0].meta.copy()
         merged_img_meta.update({
             "transform": layers[list(layers.keys())[0]]['out_trans'],
-            "height": out_all.shape[1],
-            "width": out_all.shape[2],
-            "count": out_all.shape[0]
+            "height": out_all_shape[1],
+            "width": out_all_shape[2],
+            "count": out_all_shape[0]
         })
 
 
         img_filename = "/tmp/output/%s.tif" % str(output_uuid)
 
         with rio.open(img_filename, "w", **merged_img_meta) as dataset:
-            for band in make_list_layer_band(layers, out_all.shape[0]):
+            for band in make_list_layer_band(layers, out_all_shape[0]):
                 dataset.update_tags(band[0], layer=band[1], band=band[2])
             dataset.write(out_all)
 
