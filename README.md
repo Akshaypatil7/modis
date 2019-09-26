@@ -24,13 +24,13 @@ Clone the repository to a given `<directory>`:
 
 ```bash
 git clone https://github.com/up42/modis.git <directory>
-``` 
+```
 
 then do `cd <directory>`.
 
 ### Installing the required libraries
 
-First create a virtual environment either by using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) 
+First create a virtual environment either by using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/)
 or [virtualenv](https://virtualenv.pypa.io/en/latest/).
 In the case of using virtualenvwrapper do:
 
@@ -76,6 +76,12 @@ Finally you can run the end-to-end test
 
 ```bash
 make e2e
+```
+
+Additionally, you can also update the file ``available_layers.json`` by running
+
+```bash
+make available-layers
 ```
 
 If none of the commands throws any errors you can push the block to the UP42 platform as a custom block.
