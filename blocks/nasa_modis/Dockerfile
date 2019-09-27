@@ -1,6 +1,6 @@
 ### Dockerfile to build modis block.
 
-FROM interstellar-base-python3
+FROM python:3.7.1-stretch
 ARG manifest
 LABEL "up42_manifest"=$manifest
 
