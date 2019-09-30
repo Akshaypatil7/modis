@@ -28,54 +28,54 @@ def test_get_capabilities_live():
 
 
 @pytest.mark.live
-def test_get_dict_available_layers_live():
-    layers = GibsAPI().get_dict_available_layers()
-    print(layers)
-    print(len(layers))
-    assert len(layers) >= 5
+def test_get_dict_available_imagery_layers_live():
+    imagery_layers = GibsAPI().get_dict_available_imagery_layers()
+    print(imagery_layers)
+    print(len(imagery_layers))
+    assert len(imagery_layers) >= 5
 
 
-def test_get_dict_available_layers(requests_mock):
+def test_get_dict_available_imagery_layers(requests_mock):
     _location_ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
-    with open(os.path.join(_location_, 'mock_data/available_layers.xml'), "rb") as xml_file:
+    with open(os.path.join(_location_, 'mock_data/available_imagery_layers.xml'), "rb") as xml_file:
         fake_xml: object = xml_file.read()
 
     requests_mock.get(mock.ANY, content=fake_xml)
 
-    layers = GibsAPI().get_dict_available_layers()
+    imagery_layers = GibsAPI().get_dict_available_imagery_layers()
 
-    assert layers['MODIS_Aqua_CorrectedReflectance_TrueColor']['Identifier']\
+    assert imagery_layers['MODIS_Aqua_CorrectedReflectance_TrueColor']['Identifier']\
            == 'MODIS_Aqua_CorrectedReflectance_TrueColor'
-    assert len(layers) == 45
+    assert len(imagery_layers) == 45
 
 
-def test_validate_layers(requests_mock):
+def test_validate_imagery_layers(requests_mock):
     _location_ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
-    with open(os.path.join(_location_, 'mock_data/available_layers.xml'), "rb") as xml_file:
+    with open(os.path.join(_location_, 'mock_data/available_imagery_layers.xml'), "rb") as xml_file:
         fake_xml: object = xml_file.read()
 
     requests_mock.get(mock.ANY, content=fake_xml)
 
-    valid, invalid, _ = GibsAPI().validate_layers(
+    valid, invalid, _ = GibsAPI().validate_imagery_layers(
         ['MODIS_Aqua_CorrectedReflectance_TrueColor'], [50, 50, 60, 60]
     )
     assert valid
     assert invalid == ([], [])
 
-    valid, invalid, _ = GibsAPI().validate_layers(['ABC'], [50, 50, 60, 60])
+    valid, invalid, _ = GibsAPI().validate_imagery_layers(['ABC'], [50, 50, 60, 60])
     assert not valid
     assert invalid[0] == ['ABC']
 
-    multiple_valid, invalid, _ = GibsAPI().validate_layers(
+    multiple_valid, invalid, _ = GibsAPI().validate_imagery_layers(
         ['MODIS_Aqua_CorrectedReflectance_TrueColor', 'MODIS_Terra_CorrectedReflectance_TrueColor'],
         [50, 50, 60, 60]
     )
     assert multiple_valid
     assert invalid == ([], [])
 
-    multiple_valid, invalid, _ = GibsAPI().validate_layers(
+    multiple_valid, invalid, _ = GibsAPI().validate_imagery_layers(
         [
             'MODIS_Aqua_CorrectedReflectance_TrueColor',
             'MODIS_Terra_CorrectedReflectance_TrueColor', 'ABC'
@@ -84,7 +84,7 @@ def test_validate_layers(requests_mock):
     assert not multiple_valid
     assert invalid[0] == ['ABC']
 
-    multiple_geom, invalid, _ = GibsAPI().validate_layers(
+    multiple_geom, invalid, _ = GibsAPI().validate_imagery_layers(
         ['MODIS_Aqua_CorrectedReflectance_TrueColor'], [200, 200, 210, 210]
     )
     assert not multiple_geom
@@ -174,7 +174,7 @@ def test_extract_query_dates():
 
 
 def test_make_list_layer_band():
-    test_layers = collections.OrderedDict({
+    test_imagery_layers = collections.OrderedDict({
         'MODIS_Terra_CorrectedReflectance_TrueColor':
             {
                 'Identifier': 'MODIS_Terra_CorrectedReflectance_TrueColor',
@@ -190,11 +190,11 @@ def test_make_list_layer_band():
     })
 
     test_count = 6
-    list_layers = make_list_layer_band(test_layers, test_count)
-    assert len(list_layers) == 6
-    assert list_layers[0] == [1, 'MODIS_Terra_CorrectedReflectance_TrueColor', 1]
-    assert list_layers[1] == [2, 'MODIS_Terra_CorrectedReflectance_TrueColor', 2]
-    assert list_layers[3] == [4, 'MODIS_Aqua_CorrectedReflectance_TrueColor', 1]
+    list_imagery_layers = make_list_layer_band(test_imagery_layers, test_count)
+    assert len(list_imagery_layers) == 6
+    assert list_imagery_layers[0] == [1, 'MODIS_Terra_CorrectedReflectance_TrueColor', 1]
+    assert list_imagery_layers[1] == [2, 'MODIS_Terra_CorrectedReflectance_TrueColor', 2]
+    assert list_imagery_layers[3] == [4, 'MODIS_Aqua_CorrectedReflectance_TrueColor', 1]
 
 
 def test_download_wmts_tile_as_geotiff(requests_mock):
@@ -290,13 +290,13 @@ def test_get_merged_image():
 @pytest.mark.live
 def test_get_multiple_merged_image():
     """
-    Unmocked ("live") test with multiple layers making sure output images have
+    Unmocked ("live") test with multiple imagery_layers making sure output images have
     correct metadata set
     """
     test_tiles = [mercantile.Tile(x=290, y=300, z=9), mercantile.Tile(x=290, y=301, z=9)]
 
     test_date = '2019-06-20'
-    test_layers = {
+    test_imagery_layers = {
         'MODIS_Terra_CorrectedReflectance_TrueColor':
             {
                 'Identifier': 'MODIS_Terra_CorrectedReflectance_TrueColor',
@@ -310,7 +310,7 @@ def test_get_multiple_merged_image():
     }
 
     result_filename = GibsAPI().get_merged_image(
-        test_layers, test_tiles, test_date, "a8ebbe34-4d63-4eef-8ff4-c69da3ee359d"
+        test_imagery_layers, test_tiles, test_date, "a8ebbe34-4d63-4eef-8ff4-c69da3ee359d"
     )
 
     expected_meta = {

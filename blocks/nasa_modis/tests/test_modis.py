@@ -30,7 +30,7 @@ def test_aoiclipped_fetcher_fetch_in_dry_run_mode():
             123.70257586240771,
             -10.113232998848046
         ],
-        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]
+        "imagery_layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]
     })
 
     result = Modis.AOIClippedFetcher().fetch(query, dry_run=True)
@@ -43,7 +43,7 @@ def test_aoiclipped_fetcher_fetch_in_dry_run_mode():
 @pytest.mark.live
 def test_aoiclipped_fetcher_multiple_fetch_in_dry_run_mode():
     """
-    Test for dry-run mode i.e. only metadata is returned, multiple layers
+    Test for dry-run mode i.e. only metadata is returned, multiple imagery_layers
     """
 
     query = STACQuery.from_dict({
@@ -56,8 +56,8 @@ def test_aoiclipped_fetcher_multiple_fetch_in_dry_run_mode():
             123.70257586240771,
             -10.113232998848046
         ],
-        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor",
-                   "MODIS_Aqua_CorrectedReflectance_TrueColor"]
+        "imagery_layers": ["MODIS_Terra_CorrectedReflectance_TrueColor",
+                           "MODIS_Aqua_CorrectedReflectance_TrueColor"]
     })
 
     result = Modis.AOIClippedFetcher().fetch(query, dry_run=True)
@@ -83,8 +83,8 @@ def test_aoiclipped_fetcher_layer_error_fetch_in_dry_run_mode():
             123.70257586240771,
             -10.113232998848046
         ],
-        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor",
-                   "AN_ERROR_FOR_SURE"]
+        "imagery_layers": ["MODIS_Terra_CorrectedReflectance_TrueColor",
+                           "AN_ERROR_FOR_SURE"]
     })
 
     with pytest.raises(ValueError, match=r".*['AN_ERROR_FOR_SURE'].*"):
@@ -107,7 +107,7 @@ def test_aoiclipped_fetcher_geom_error_fetch_in_dry_run_mode():
             210,
             210
         ],
-        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]
+        "imagery_layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]
     })
 
     with pytest.raises(ValueError):
@@ -124,7 +124,7 @@ def test_aoiclipped_fetcher_fetch(requests_mock):
     with open(os.path.join(_location_, 'mock_data/tile.jpg'), "rb") as tile_file:
         mock_image: object = tile_file.read()
 
-    with open(os.path.join(_location_, 'mock_data/available_layers.xml'), "rb") as xml_file:
+    with open(os.path.join(_location_, 'mock_data/available_imagery_layers.xml'), "rb") as xml_file:
         mock_xml: object = xml_file.read()
 
     matcher_wms = re.compile('https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?')
@@ -146,7 +146,7 @@ def test_aoiclipped_fetcher_fetch(requests_mock):
             123.70257586240771,
             -10.113232998848046
         ],
-        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]
+        "imagery_layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]
     })
 
     result = Modis.AOIClippedFetcher().fetch(query, dry_run=False)
@@ -167,7 +167,7 @@ def test_aoiclipped_dry_run_error_name_fetcher_fetch(requests_mock):
     _location_ = os.path.realpath(os.path.join(os.getcwd(),
                                                os.path.dirname(__file__)))
 
-    with open(os.path.join(_location_, 'mock_data/available_layers.xml'), "rb") as xml_file:
+    with open(os.path.join(_location_, 'mock_data/available_imagery_layers.xml'), "rb") as xml_file:
         mock_xml: object = xml_file.read()
 
     matcher_get_capabilities = re.compile('WMTSCapabilities.xml')
@@ -184,7 +184,7 @@ def test_aoiclipped_dry_run_error_name_fetcher_fetch(requests_mock):
             123.70257586240771,
             -10.113232998848046
         ],
-        "layers": ["AN_ERROR_FOR_SURE"]
+        "imagery_layers": ["AN_ERROR_FOR_SURE"]
     })
 
     with pytest.raises(ValueError, match=r".*['AN_ERROR_FOR_SURE'].*"):
@@ -198,7 +198,7 @@ def test_aoiclipped_dry_run_multiple_error_name_fetcher_fetch(requests_mock):
     _location_ = os.path.realpath(os.path.join(os.getcwd(),
                                                os.path.dirname(__file__)))
 
-    with open(os.path.join(_location_, 'mock_data/available_layers.xml'), "rb") as xml_file:
+    with open(os.path.join(_location_, 'mock_data/available_imagery_layers.xml'), "rb") as xml_file:
         mock_xml: object = xml_file.read()
 
     matcher_get_capabilities = re.compile('WMTSCapabilities.xml')
@@ -215,9 +215,9 @@ def test_aoiclipped_dry_run_multiple_error_name_fetcher_fetch(requests_mock):
             123.70257586240771,
             -10.113232998848046
         ],
-        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor",
-                   "MODIS_Aqua_CorrectedReflectance_TrueColor",
-                   "12345", "AN_ERROR_FOR_SURE"]})
+        "imagery_layers": ["MODIS_Terra_CorrectedReflectance_TrueColor",
+                           "MODIS_Aqua_CorrectedReflectance_TrueColor",
+                           "12345", "AN_ERROR_FOR_SURE"]})
 
     with pytest.raises(ValueError, match=r".*['12345','AN_ERROR_FOR_SURE'].*"):
         Modis.AOIClippedFetcher().fetch(query, dry_run=True)
@@ -230,7 +230,7 @@ def test_aoiclipped_dry_run_error_geom_fetcher_fetch(requests_mock):
     _location_ = os.path.realpath(os.path.join(os.getcwd(),
                                                os.path.dirname(__file__)))
 
-    with open(os.path.join(_location_, 'mock_data/available_layers.xml'), "rb") as xml_file:
+    with open(os.path.join(_location_, 'mock_data/available_imagery_layers.xml'), "rb") as xml_file:
         mock_xml: object = xml_file.read()
 
     matcher_get_capabilities = re.compile('WMTSCapabilities.xml')
@@ -247,7 +247,7 @@ def test_aoiclipped_dry_run_error_geom_fetcher_fetch(requests_mock):
             210,
             210
         ],
-        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]
+        "imagery_layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]
     })
 
     with pytest.raises(ValueError):
@@ -270,7 +270,7 @@ def test_aoiclipped_fetcher_fetch_live():
             39.686130881309516,
             21.808610762909364
         ],
-        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]
+        "imagery_layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]
     })
 
     result = Modis.AOIClippedFetcher().fetch(query, dry_run=False)
@@ -299,7 +299,7 @@ def test_aoiclipped_fetcher_virs_fetch_live():
             39.686130881309516,
             21.808610762909364
         ],
-        "layers": ["VIIRS_SNPP_Brightness_Temp_BandI5_Night"]
+        "imagery_layers": ["VIIRS_SNPP_Brightness_Temp_BandI5_Night"]
     })
 
     result = Modis.AOIClippedFetcher().fetch(query, dry_run=False)
@@ -328,8 +328,8 @@ def test_aoiclipped_fetcher_rio_tags_fetch_live():
             39.686130881309516,
             21.808610762909364
         ],
-        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor",
-                   "VIIRS_SNPP_Brightness_Temp_BandI5_Night"]
+        "imagery_layers": ["MODIS_Terra_CorrectedReflectance_TrueColor",
+                           "VIIRS_SNPP_Brightness_Temp_BandI5_Night"]
     })
 
     result = Modis.AOIClippedFetcher().fetch(query, dry_run=False)
@@ -354,7 +354,7 @@ def test_aoiclipped_fetcher_rio_tags_fetch_live():
 @pytest.mark.live
 def test_aoiclipped_fetcher_multiple_fetch_live():
     """
-    Unmocked ("live") test for fetching data, multiple layers
+    Unmocked ("live") test for fetching data, multiple imagery_layers
     """
 
     query = STACQuery.from_dict({
@@ -367,8 +367,8 @@ def test_aoiclipped_fetcher_multiple_fetch_live():
             39.686130881309516,
             21.808610762909364
         ],
-        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor",
-                   "MODIS_Aqua_CorrectedReflectance_TrueColor"]
+        "imagery_layers": ["MODIS_Terra_CorrectedReflectance_TrueColor",
+                           "MODIS_Aqua_CorrectedReflectance_TrueColor"]
     })
 
     result = Modis.AOIClippedFetcher().fetch(query, dry_run=False)
@@ -399,8 +399,8 @@ def test_aoiclipped_fetcher_layer_error_fetch_live():
             39.686130881309516,
             21.808610762909364
         ],
-        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor",
-                   "AN_ERROR_FOR_SURE"]
+        "imagery_layers": ["MODIS_Terra_CorrectedReflectance_TrueColor",
+                           "AN_ERROR_FOR_SURE"]
     })
 
     with pytest.raises(ValueError, match=r".*['AN_ERROR_FOR_SURE'].*"):
@@ -423,7 +423,7 @@ def test_aoiclipped_fetcher_geom_error_fetch_live():
             210,
             210
         ],
-        "layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]
+        "imagery_layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"]
     })
 
     with pytest.raises(ValueError):

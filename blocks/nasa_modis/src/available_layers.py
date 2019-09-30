@@ -3,12 +3,12 @@ import json
 from gibs import GibsAPI
 
 def run():
-    layers = GibsAPI().get_dict_available_layers()
-    for layer in layers:
-        layers[layer]['WGS84BoundingBox'] = layers[layer]['WGS84BoundingBox'].wkt
+    imagery_layers = GibsAPI().get_dict_available_imagery_layers()
+    for layer in imagery_layers:
+        imagery_layers[layer]['WGS84BoundingBox'] = imagery_layers[layer]['WGS84BoundingBox'].wkt
 
-    with open(os.path.realpath(os.path.join(os.getcwd(), 'available_layers.json')), 'w') as out:
-        json.dump(layers, out)
+    with open(os.path.realpath(os.path.join(os.getcwd(), 'available_imagery_layers.json')), 'w') as out:
+        json.dump(imagery_layers, out)
 
 if __name__ == '__main__':
     run()

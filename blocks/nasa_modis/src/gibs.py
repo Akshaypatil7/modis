@@ -61,20 +61,20 @@ def extract_query_dates(query: STACQuery) -> list:
     return date_list
 
 
-def make_list_layer_band(layers: collections.OrderedDict, count: int) -> List:
+def make_list_layer_band(imagery_layers: collections.OrderedDict, count: int) -> List:
     """
     Makes list of all output bands and their respective provenance.
 
-    :param layers: All layers included in output file and attributes
+    :param imagery_layers: All imagery_layers included in output file and attributes
     :param count: The count of all bands in output file
     :return: A list output bands and their provenance
     """
     out_list: List[List] = []
     band_order: List[int] = []
     layer_names: List[str] = []
-    for layer in layers:
-        layer_names += [layer] * (layers[layer]['out_ar_shape'][0])
-        band_order += list(range(1, layers[layer]['out_ar_shape'][0]+1))
+    for layer in imagery_layers:
+        layer_names += [layer] * (imagery_layers[layer]['out_ar_shape'][0])
+        band_order += list(range(1, imagery_layers[layer]['out_ar_shape'][0]+1))
 
     for band_number in range(1, count+1):
         layer_name = layer_names[band_number-1]
@@ -103,14 +103,14 @@ class GibsAPI:
         response = requests.request("GET", url)
         return response
 
-    def get_dict_available_layers(self) -> dict:
+    def get_dict_available_imagery_layers(self) -> dict:
         """
-        Get a dictionary of all suitable layers (with TileMatrixSet ==
+        Get a dictionary of all suitable imagery_layers (with TileMatrixSet ==
         GoogleMapsCompatible_Level9) and output a dict with relevant attributes:
         Identifier, TileMatrixSet, WGS84BoundingBox and Format
         """
         capabilities = xmltodict.parse(self.get_capabilities().text)
-        layers = {}
+        imagery_layers = {}
         for layer in capabilities['Capabilities']['Contents']['Layer']:
             extent_lc = layer['ows:WGS84BoundingBox']['ows:LowerCorner']
             extent_uc = layer['ows:WGS84BoundingBox']['ows:UpperCorner']
@@ -121,20 +121,20 @@ class GibsAPI:
                          "WGS84BoundingBox": extent_bbox,
                          "Format": layer['Format'].split("/")[1]}
             if candidate["TileMatrixSet"] == "GoogleMapsCompatible_Level9":
-                layers[candidate["Identifier"]] = candidate
-        return layers
+                imagery_layers[candidate["Identifier"]] = candidate
+        return imagery_layers
 
-    def validate_layers(self,
-                        layers: collections.OrderedDict,
-                        bbox: List[float]) -> Tuple[bool,
-                                                    Tuple,
-                                                    collections.OrderedDict]:
+    def validate_imagery_layers(self,
+                                imagery_layers: collections.OrderedDict,
+                                bbox: List[float]) -> Tuple[bool,
+                                                            Tuple,
+                                                            collections.OrderedDict]:
         """
-        Get a dictionary of all suitable layers (with TileMatrixSet ==
+        Get a dictionary of all suitable imagery_layers (with TileMatrixSet ==
         GoogleMapsCompatible_Level9) and output a dict with relevant attributes:
         Identifier, TileMatrixSet, WGS84BoundingBox and Format
         """
-        available_layers = self.get_dict_available_layers()
+        available_imagery_layers = self.get_dict_available_imagery_layers()
         search_geom = box(*bbox)
 
         is_name = True
@@ -143,22 +143,22 @@ class GibsAPI:
         invalid_names: List[str] = []
         invalid_geom: List[str] = []
 
-        valid_layers: collections.OrderedDict = collections.OrderedDict()
+        valid_imagery_layers: collections.OrderedDict = collections.OrderedDict()
 
-        for each_layer in layers:
-            is_name = each_layer in available_layers.keys() and is_name
+        for each_layer in imagery_layers:
+            is_name = each_layer in available_imagery_layers.keys() and is_name
             if is_name:
                 has_intersection =\
-                available_layers[each_layer]["WGS84BoundingBox"].intersects(search_geom)\
+                available_imagery_layers[each_layer]["WGS84BoundingBox"].intersects(search_geom)\
                     and has_intersection
                 if not has_intersection:
-                    invalid_geom += [available_layers[each_layer]["WGS84BoundingBox"].wkt]
+                    invalid_geom += [available_imagery_layers[each_layer]["WGS84BoundingBox"].wkt]
                 else:
-                    valid_layers[each_layer] = available_layers[each_layer]
+                    valid_imagery_layers[each_layer] = available_imagery_layers[each_layer]
             else:
                 invalid_names += [each_layer]
 
-        return (is_name and has_intersection), (invalid_names, invalid_geom), valid_layers
+        return (is_name and has_intersection), (invalid_names, invalid_geom), valid_imagery_layers
 
 
     def download_quicklook(self, layer: str, bbox, date: str) -> Response:
@@ -253,32 +253,33 @@ class GibsAPI:
         return tmp_file
 
 
-    def get_merged_image(self, layers: collections.OrderedDict, tiles: list, date: str, output_uuid: str) -> Path:
+    def get_merged_image(self, imagery_layers: collections.OrderedDict,
+                         tiles: list, date: str, output_uuid: str) -> Path:
         """
         Fetches all tiles for one date, merges them and returns a GeoTIFF
         """
 
         logger.info("Downloading tiles")
-        for layer in layers:
+        for layer in imagery_layers:
             img_files = []
             logger.info("Getting %s", layer)
             for tile in tiles:
-                tiff_file = self.download_wmts_tile_as_geotiff(layer, date, tile, layers[layer]['Format'])
+                tiff_file = self.download_wmts_tile_as_geotiff(layer, date, tile, imagery_layers[layer]['Format'])
                 img_files.append(rio.open(tiff_file.name, driver="GTiff"))
             # Now merge the images
-            layers[layer]['out_ar'], layers[layer]['out_trans'] = merge(img_files)
-            layers[layer]['out_ar_shape'] = layers[layer]['out_ar'].shape
+            imagery_layers[layer]['out_ar'], imagery_layers[layer]['out_trans'] = merge(img_files)
+            imagery_layers[layer]['out_ar_shape'] = imagery_layers[layer]['out_ar'].shape
 
-            logger.info("Shape of layer is %r", layers[layer]['out_ar'].shape)
+            logger.info("Shape of layer is %r", imagery_layers[layer]['out_ar'].shape)
             logger.info("Layer %s added!", layer)
 
-        out_all = np.concatenate([layers[k]['out_ar'] for k in layers])
+        out_all = np.concatenate([imagery_layers[k]['out_ar'] for k in imagery_layers])
 
         out_all_shape = tuple(out_all.shape)
 
         merged_img_meta = img_files[0].meta.copy()
         merged_img_meta.update({
-            "transform": layers[list(layers.keys())[0]]['out_trans'],
+            "transform": imagery_layers[list(imagery_layers.keys())[0]]['out_trans'],
             "height": out_all_shape[1],
             "width": out_all_shape[2],
             "count": out_all_shape[0]
@@ -288,7 +289,7 @@ class GibsAPI:
         img_filename = "/tmp/output/%s.tif" % str(output_uuid)
 
         with rio.open(img_filename, "w", **merged_img_meta) as dataset:
-            for band in make_list_layer_band(layers, out_all_shape[0]):
+            for band in make_list_layer_band(imagery_layers, out_all_shape[0]):
                 dataset.update_tags(band[0], layer=band[1], band=band[2])
             dataset.write(out_all)
 
