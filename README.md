@@ -46,25 +46,25 @@ First create a virtual environment either by using [virtualenvwrapper](https://v
 or [virtualenv](https://virtualenv.pypa.io/en/latest/).
 In the case of using virtualenvwrapper do:
 
-```
+```bash
 mkvirtualenv --python=$(which python3.7) up42-modis
 ```
 
 In the case of using virtualenv do:
 
-```
+```bash
 virtualenv -p $(which python3.7) up42-modis
 ```
 
 Activate the virtualenv:
 
-```
+```bash
 workon up42-modis
 ```
 
 After creating a virtual environment and activating it, all the necessary libraries can be installed on this environment by doing:
 
-```
+```bash
 make install
 ```
 
@@ -81,13 +81,13 @@ make test
 
 Build the docker image locally:
 
-```
+```bash
 make build
 ```
 
 Now you can run the end to end tests:
 
-```
+```bash
 make e2e
 ```
 
@@ -110,7 +110,7 @@ docker push registry.up42.com/<UID>/<image_name>:<tag>
 
 First make sure the manifest is valid:
 
-```
+```bash
 make validate
 ```
 
@@ -144,7 +144,7 @@ Now you can finally push the image to the UP42 docker registry:
 make push UID=<UID>
 ```
 
-where `<UID>` is user ID referenced above.
+Where `<UID>` is user ID referenced above.
 
 Note that if you specified a custom docker tag when you built the image, you
 need to pass it now to `make`.
@@ -161,11 +161,9 @@ now use the block in a workflow.
 
 Additionally, you can also update the file ``available_layers.json`` by running
 
-```
+```bash
 make available-layers
 ```
-
-If none of the commands throws any errors you can push the block to the UP42 platform as a custom block.
 
 ## Support
 
