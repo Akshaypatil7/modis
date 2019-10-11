@@ -1,161 +1,167 @@
-# MODIS AOI-Clipped data block
+# Data block example: MODIS AOI-Clipped
 ## Introduction
 
 This is an example data block based on NASA's [Global Imagery Browse Services (GIBS)](https://earthdata.nasa.gov/eosdis/science-system-description/eosdis-components/gibs) providing access to three-band
 MODIS imagery. This block can also provide other MODIS derived data such as the Normalized Difference Vegetation Index (NDVI) (rolling 8-day average) product or additional MODIS bands such as Corrected Reflectance for Bands 7-2-1.
 
-## Block description
+t functions as an example data block. The block functionality and performed
+processing steps are described in more detail in
+the [UP42 documentation: MODIS data block](https://docs.up42.com/up42-blocks/data/modis.html).
 
-* Block type: data   
-* Output type: AOIClipped (geo-referenced [GeoTIFF](https://en.wikipedia.org/wiki/GeoTIFF))
-* Provider: [UP42](https://up42.com)
-* Tags: MODIS, NASA, AOI clipped
+**Block Input**: [Filter set](https://docs.up42.com/going-further/filters.html)
 
-### Inputs & outputs
-
-The output is a [GeoTIFF](https://en.wikipedia.org/wiki/GeoTIFF) file.
-
-### Block capabilities
-
-This block has a single output capability, `up42.data.aoiclipped`.
+**Block Output**: [GeoTIFF](https://en.wikipedia.org/wiki/GeoTIFF) file.
 
 ## Requirements
 
- 1. [git](https://git-scm.com/).
- 2. [docker engine](https://docs.docker.com/engine/).
- 3. [UP42](https://up42.com) account credentials.
- 5. [GNU make](https://www.gnu.org/software/make/).
- 5. [Python](https://python.org/downloads): version >= 3.7 &mdash; only
-    for [local development](#local-development).
+This example requires the **Mac or Ubuntu bash**, an example using **Windows** will be provided shortly.
+In order to bring this example block or your own custom block to the UP42 platform the following tools are required:
 
-## Usage
+
+ - [UP42](https://up42.com) account -  Sign up for free!
+ - [Python 3.7](https://python.org/downloads)
+ - A virtual environment manager e.g. [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/)
+ - [git](https://git-scm.com/)
+ - [docker engine](https://docs.docker.com/engine/)
+ - [GNU make](https://www.gnu.org/software/make/)
+
+
+## Instructions
+
+The following step-by-step instructions will guide you through setting up, dockerizing and pushing the example custom
+block to UP42.
 
 ### Clone the repository
-
-Clone the repository:
 
 ```bash
 git clone https://github.com/up42/modis.git
 ```
 
-Then do `cd modis`.
+Then navigate to the folder via `cd modis`.
 
 ### Installing the required libraries
 
-First create a virtual environment either by using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/)
-or [virtualenv](https://virtualenv.pypa.io/en/latest/).
-In the case of using virtualenvwrapper do:
+First create a new virtual environment called `up42-nasa`, for example by using
+[virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/):
 
 ```bash
-mkvirtualenv --python=$(which python3.7) up42-modis
+mkvirtualenv --python=$(which python3.7) up42-nasa
 ```
 
-In the case of using virtualenv do:
+Activate the new environment:
 
 ```bash
-virtualenv -p $(which python3.7) up42-modis
+workon up42-nasa
 ```
 
-Activate the virtualenv:
-
-```bash
-workon up42-modis
-```
-
-After creating a virtual environment and activating it, all the necessary libraries can be installed on this environment by doing:
+Install the necessary Python libraries via:
 
 ```bash
 make install
 ```
 
-### Run the tests
+## Testing the block locally
 
-This project uses [pytest](https://docs.pytest.org/en/latest/) for
-testing.  To run the tests, do as following:
+Before uploading the block to the UP42 platform, we encourage you to run the following local tests and validations to
+ensure that the block works as expected, conforms to the UP42 specifications and can could successfully applied in an
+UP42 workflow.
+
+### Run the unit tests
+
+By successfully running the implemented Python unit tests you can ensure that the block processing functionality works
+as expected. This project uses [pytest](https://docs.pytest.org/en/latest/) for testing, which was installed in
+the previous step. Run the unit tests via:
 
 ```bash
 make test
 ```
 
-### Dockerizing the block
+### Validate the manifest
 
-Build the docker image locally:
-
-```bash
-make build
-```
-
-Now you can run the end to end tests:
-
-```bash
-make e2e
-```
-
-### Pushing the block to the UP42 platform
-
-For building the images you should tag the image in a way that can be
-pushed to the UP42 docker registry, enabling you to run it as a custom
-block. For that you need to pass your user ID (UID) in the `make`
-command.
-
-The quickest way to get that is just to go into the UP42 console and
-copy & paste from the last clipboard that you get at the
-[custom-blocks](https://console.up42.com/custom-blocks) page and after
-clicking on **PUSH a BLOCK to THE PLATFORM**. For example, it will be
-something like:
-
-```bash
-docker push registry.up42.com/<UID>/<image_name>:<tag>
-```
-
-First make sure the manifest is valid:
+Then test if the block manifest is valid. The
+[UP42manifest.json](https://github.com/up42/modis/blob/master/blocks/modis/UP42Manifest.json)
+file contains the block capabilities. They define what kind of data a block accepts and provides, which parameters
+can be used with the block etc. See the
+[UP42 block capabilities documentation](https://docs.up42.com/reference/capabilities.html?highlight=capabilities).
+Validate the manifest via:
 
 ```bash
 make validate
 ```
 
-Now you can launch the image building using `make` like this:
+### Run the end-to-end test
 
-```bash
-make build UID=<UID>
+In order to run the final end-to-end (`e2e`) test the block code needs to be dockerized (put in a container that later on
+would be uploaded to UP42). The end-to-end test makes sure the block's output actually conforms to the platform's requirements.
+
+First build the docker image locally.
+
+```
+make build
 ```
 
-You can additionally specify a custom tag and version for your image (default tag
-is `nasa-modis:latest` - `<DOCKER_TAG>:<DOCKER_VERSION>`):
+Run the `e2e` tests with:
 
 ```bash
-make build UID=<UID> DOCKER_TAG=<docker tag> DOCKER_VERSION=<docker version>
+make e2e
 ```
 
-#### Push the image to the UP42 registry
 
-You first need to login into the UP42 docker registry.
+## Pushing the block to the UP42 platform
+
+First login to he UP42 docker registry. `me@example.com` needs to be replaced by your **UP42 username**,
+which is the email address you use on the UP42 website.
 
 ```bash
 make login USER=me@example.com
 ```
 
-Where `me@example.com` should be replaced by your username, which is
-the email address you use in UP42.
+In order to push the block to the UP42 platform, you need to build the block Docker container with your
+**UP42 USER-ID**. To get your USER-ID, go to the [UP42 custom-blocks menu](https://console.up42.com/custom-blocks).
+Click on "`PUSH a BLOCK to THE PLATFORM`" and copy your USERID from the command shown on the last line at
+"`Push the image to the UP42 Docker registry`". The USERID will look similar to this:
+`63uayd50-z2h1-3461-38zq-1739481rjwia`
 
-Now you can finally push the image to the UP42 docker registry:
+Pass the USER-ID to the build command:
+```bash
+make build UID=<UID>
+
+# As an example: make build UID=63uayd50-z2h1-3461-38zq-1739481rjwia
+```
+
+Now you can finally push the image to the UP42 docker registry, again passing in your USER-ID:
 
 ```bash
 make push UID=<UID>
+
+# As an example: make push UID=63uayd50-z2h1-3461-38zq-1739481rjwia
 ```
 
-Where `<UID>` is user ID referenced above.
+**Success!** The block will now appear in the [UP42 custom blocks menu](https://console.up42.com/custom-blocks/) menu
+and can be selected under the *Custom blocks* tab when building a workflow.
 
-Note that if you specified a custom docker tag or version when you built the image, you
-need to pass it now to `make`.
+<p align="center">
+  <img width="500" src="https://i.ibb.co/YpmwxY2/custom-block-successfully-uploaded.png">
+</p>
+
+### Optional: Updating an existing custom block
+
+If you want to update a custom block on UP42, you need to build the Docker container with an updated version:
+The default docker tag is `modis` and the version is set to `latest`.
 
 ```bash
-make push UID=<UID> DOCKER_TAG=<docker tag> DOCKER_VERSION=<docker version>
+make build UID=<UID> DOCKER_TAG=<docker tag> DOCKER_VERSION=<docker version>
+
+# As an example: docker build UID=63uayd50-z2h1-3461-38zq-1739481rjwia DOCKER_TAG=modis DOCKER_VERSION=1.0
 ```
 
-After the image is pushed you should be able to see your custom block
-in the [console](https://console.up42.dev/custom-blocks/) and you can
-now use the block in a workflow.
+Then push the block container with the updated tag and version:
+
+```bash
+make push UID=<UID> DOCKER_TAG=<docker tag>
+
+# As an example: make push UID=63uayd50-z2h1-3461-38zq-1739481rjwia DOCKER_TAG=modis DOCKER_VERSION=1.0
+```
 
 ### Available layers
 
@@ -167,7 +173,5 @@ make available-layers
 
 ## Support
 
- 1. Open an issue here.
- 2. Reach out to us on
-      [gitter](https://gitter.im/up42-com/community).
- 3. Mail us [support@up42.com](mailto:support@up42.com).
+Open a **github issue** in this repository or send us an **email** at [support@up42.com](mailto:support@up42.com),
+we are happy to answer your questions!
