@@ -4,7 +4,7 @@
 This is an example data block based on NASA's [Global Imagery Browse Services (GIBS)](https://earthdata.nasa.gov/eosdis/science-system-description/eosdis-components/gibs) providing access to three-band
 MODIS imagery. This block can also provide other MODIS derived data such as the Normalized Difference Vegetation Index (NDVI) (rolling 8-day average) product or additional MODIS bands such as Corrected Reflectance for Bands 7-2-1.
 
-t functions as an example data block. The block functionality and performed
+It functions as an example data block. The block functionality and performed
 processing steps are described in more detail in
 the [UP42 documentation: MODIS data block](https://docs.up42.com/up42-blocks/data/modis.html).
 
