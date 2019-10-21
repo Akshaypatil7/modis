@@ -3,6 +3,7 @@ SRC := blocks/nasa_modis
 UP42_DOCKERFILE := Dockerfile
 DOCKER_TAG := nasa-modis
 DOCKER_VERSION := latest
+UP42_MANIFEST := $(SRC)/UP42Manifest.json
 
 VALIDATE_ENDPOINT := https://api.up42.com/validate-schema/block
 REGISTRY := registry.up42.com
@@ -27,9 +28,9 @@ validate:
 
 build:
 ifdef UID
-	cd blocks/nasa_modis; docker build --build-arg manifest="$(cat UP42Manifest.json)" -f Dockerfile -t $(REGISTRY)/$(UID)/$(DOCKER_TAG):$(DOCKER_VERSION) .
+	cd $(SRC); docker build --build-arg manifest='$(shell cat ${UP42_MANIFEST})' -f $(UP42_DOCKERFILE) -t $(REGISTRY)/$(UID)/$(DOCKER_TAG):$(DOCKER_VERSION) .
 else
-	cd blocks/nasa_modis; docker build -t nasa-modis -f Dockerfile .
+	cd $(SRC); docker build --build-arg manifest='$(shell cat ${UP42_MANIFEST})'  -f $(UP42_DOCKERFILE) -t $(DOCKER_TAG) .
 endif
 
 push:
