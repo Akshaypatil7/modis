@@ -9,7 +9,7 @@ VALIDATE_ENDPOINT := https://api.up42.com/validate-schema/block
 REGISTRY := registry.up42.com
 
 install:
-	pip install -r blocks/nasa_modis/requirements.txt
+	pip install -r $(SRC)/requirements.txt
 
 test:
 	python -m pytest --pylint --pylint-rcfile=../../pylintrc --mypy --mypy-ignore-missing-imports --cov=blocks/nasa_modis/src/
