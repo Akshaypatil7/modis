@@ -10,9 +10,9 @@ import geojson
 import rasterio as rio
 
 if __name__ == "__main__":
-    OUTPUT_DIR = Path('/tmp/e2e_modis')
+    OUTPUT_DIR = Path("/tmp/e2e_modis")
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    FILES_TO_DELETE = Path(OUTPUT_DIR / 'output').glob('*.*')
+    FILES_TO_DELETE = Path(OUTPUT_DIR / "output").glob("*.*")
     for file_path in FILES_TO_DELETE:
         file_path.unlink()
 
@@ -22,17 +22,17 @@ if __name__ == "__main__":
                  -it nasa-modis"""
     os.system(RUN_CMD)
 
-    GEOJSON_PATH = OUTPUT_DIR / 'output' / 'data.json'
+    GEOJSON_PATH = OUTPUT_DIR / "output" / "data.json"
 
     with open(str(GEOJSON_PATH)) as f:
         FEATURE_COLLECTION = geojson.load(f)
 
     IMG_FILENAME = "%s/%s" % (
-        str(OUTPUT_DIR / 'output'
-           ), FEATURE_COLLECTION.features[0]["properties"]["up42.data.aoiclipped"]
+        str(OUTPUT_DIR / "output"),
+        FEATURE_COLLECTION.features[0]["properties"]["up42.data.aoiclipped"],
     )
     with rio.open(IMG_FILENAME) as dataset:
         META = dataset.meta
-        assert META['width'] == 256
-        assert META['height'] == 256
-        assert META['count'] == 4
+        assert META["width"] == 256
+        assert META["height"] == 256
+        assert META["count"] == 4

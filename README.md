@@ -175,3 +175,8 @@ make available-layers
 
 Open a **github issue** in this repository or send us an **email** at [support@up42.com](mailto:support@up42.com),
 we are happy to answer your questions!
+
+## Questions and suggestions
+
+Open a **github issue** in this repository; we are happy to answer your questions!
+

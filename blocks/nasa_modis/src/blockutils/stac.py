@@ -27,50 +27,59 @@ class STACQuery:
     """
 
     def __init__(
-            self,
-            ids: Optional[list] = None,
-            bbox: Optional[BoundingBox] = None,
-            intersects: Optional[Geometry] = None,
-            contains: Optional[Geometry] = None,
-            time: Optional[str] = None,
-            limit: Optional[int] = None,
-            time_series: Optional[list] = None,
-            **kwargs): # pylint: disable=too-many-arguments
+        self,
+        ids: Optional[list] = None,
+        bbox: Optional[BoundingBox] = None,
+        intersects: Optional[Geometry] = None,
+        contains: Optional[Geometry] = None,
+        time: Optional[str] = None,
+        limit: Optional[int] = None,
+        time_series: Optional[list] = None,
+        **kwargs
+    ):  # pylint: disable=too-many-arguments
 
-        if bbox and intersects or \
-           intersects and contains or \
-           contains and bbox:
-            raise ValueError("""Only one of the following query parameters is
+        if bbox and intersects or intersects and contains or contains and bbox:
+            raise ValueError(
+                """Only one of the following query parameters is
                 allowed at a query at any given time:
                 * bbox
                 * intersects
-                * contains.""")
+                * contains."""
+            )
 
-        self.__dict__.update(kwargs) # At the front so we do not accidentally overwrite some members
+        self.__dict__.update(
+            kwargs
+        )  # At the front so we do not accidentally overwrite some members
         self.ids = ids
         self.bbox = bbox
         self.intersects = intersects
         self.contains = contains
 
         if not STACQuery.validate_datetime_str(time):
-            raise ValueError("""Time string could not be validated.
+            raise ValueError(
+                """Time string could not be validated.
                 It must be one of the following formats:
                 <RFC3339> (for points in time)
-                <RFC3339>/<RFC3339> (for datetime ranges)""")
+                <RFC3339>/<RFC3339> (for datetime ranges)"""
+            )
         self.time = time
 
         self.limit = 1 if limit is None else limit
         if limit is not None and limit < 0:
-            logger.warning('WARNING: limit parameter cannot be < 0, and has been automatically set to 1')
+            logger.warning(
+                "WARNING: limit parameter cannot be < 0, and has been automatically set to 1"
+            )
             self.limit = 1
 
         if time_series is not None:
             for datestr in time_series:
                 if not STACQuery.validate_datetime_str(datestr):
-                    raise ValueError("""Time string from time_series could not be validated.
+                    raise ValueError(
+                        """Time string from time_series could not be validated.
                         It must be one of the following formats:
                         <RFC3339> (for points in time)
-                        <RFC3339>/<RFC3339> (for datetime ranges)""")
+                        <RFC3339>/<RFC3339> (for datetime ranges)"""
+                    )
         self.time_series = time_series
 
     def bounds(self) -> BoundingBox:
@@ -84,10 +93,12 @@ class STACQuery:
         elif self.contains:
             return shapely.geometry.shape(self.contains).bounds
         else:
-            raise ValueError("""STACQuery does not contain any of the following query parameters:
+            raise ValueError(
+                """STACQuery does not contain any of the following query parameters:
                 * bbox
                 * intersects
-                * contains.""")
+                * contains."""
+            )
 
     def geometry(self) -> Geometry:
         if self.bbox:
@@ -97,10 +108,12 @@ class STACQuery:
         elif self.contains:
             return self.contains
         else:
-            raise ValueError("""STACQuery does not contain any of the following query parameters:
+            raise ValueError(
+                """STACQuery does not contain any of the following query parameters:
                 * bbox
                 * intersects
-                * contains.""")
+                * contains."""
+            )
 
     def set_param_if_not_exists(self, key, value):
         if not key in self.__dict__:
@@ -111,46 +124,75 @@ class STACQuery:
         return STACQuery.from_dict(json.loads(json_data))
 
     @classmethod
-    def from_dict(cls,
-                  dict_data: dict,
-                  validator: Callable[[dict], bool] = lambda x: True) -> STACQuery:
+    def from_dict(
+        cls, dict_data: dict, validator: Callable[[dict], bool] = lambda x: True
+    ) -> STACQuery:
 
         if not validator(dict_data):
-            raise ValueError("""Input Query did not pass validation. Please refer
-                to the official block documentation or block specification.""")
+            raise ValueError(
+                """Input Query did not pass validation. Please refer
+                to the official block documentation or block specification."""
+            )
 
-        bbox: Optional[BoundingBox] = cast(BoundingBox, dict_data.get("bbox")) \
-            if not (dict_data.get("bbox") is None or
-                    dict_data.get("bbox") == "" or
-                    dict_data.get("bbox") == {}) else None
+        bbox: Optional[BoundingBox] = cast(BoundingBox, dict_data.get("bbox")) if not (
+            dict_data.get("bbox") is None
+            or dict_data.get("bbox") == ""
+            or dict_data.get("bbox") == {}
+        ) else None
 
-        intersects: Optional[Geometry] = Geometry(**dict_data.get("intersects")) \
-            if not (dict_data.get("intersects") is None or
-                    dict_data.get("intersects") == "" or
-                    dict_data.get("intersects") == {}) else None
+        intersects: Optional[Geometry] = Geometry(
+            **dict_data.get("intersects")
+        ) if not (
+            dict_data.get("intersects") is None
+            or dict_data.get("intersects") == ""
+            or dict_data.get("intersects") == {}
+        ) else None
 
-        contains: Optional[Geometry] = Geometry(**dict_data.get("contains")) \
-            if not (dict_data.get("contains") is None or
-                    dict_data.get("contains") == "" or
-                    dict_data.get("contains") == {}) else None
+        contains: Optional[Geometry] = Geometry(**dict_data.get("contains")) if not (
+            dict_data.get("contains") is None
+            or dict_data.get("contains") == ""
+            or dict_data.get("contains") == {}
+        ) else None
 
-        time: Optional[str] = dict_data.get("time") if not dict_data.get("time") == "" else None
-        limit: Optional[int] = dict_data.get("limit") if not dict_data.get("limit") == "" else None
-        ids: Optional[list] = dict_data.get("ids") if not dict_data.get("ids") == "" else None
-        time_series: Optional[list] = dict_data.get("time_series") if not dict_data.get("time_series") == "" else None
+        time: Optional[str] = dict_data.get("time") if not dict_data.get(
+            "time"
+        ) == "" else None
+        limit: Optional[int] = dict_data.get("limit") if not dict_data.get(
+            "limit"
+        ) == "" else None
+        ids: Optional[list] = dict_data.get("ids") if not dict_data.get(
+            "ids"
+        ) == "" else None
+        time_series: Optional[list] = dict_data.get("time_series") if not dict_data.get(
+            "time_series"
+        ) == "" else None
 
-        known_filters = ['bbox', 'intersects', 'contains', 'time', 'limit', 'geometry', 'bounds', 'ids', 'time_series']
+        known_filters = [
+            "bbox",
+            "intersects",
+            "contains",
+            "time",
+            "limit",
+            "geometry",
+            "bounds",
+            "ids",
+            "time_series",
+        ]
 
-        truncated_dict_data = {key: dict_data[key] for key in dict_data if key not in known_filters}
+        truncated_dict_data = {
+            key: dict_data[key] for key in dict_data if key not in known_filters
+        }
 
-        return STACQuery(ids=ids,
-                         bbox=bbox,
-                         intersects=intersects,
-                         contains=contains,
-                         time=time,
-                         limit=limit,
-                         time_series=time_series,
-                         **truncated_dict_data)
+        return STACQuery(
+            ids=ids,
+            bbox=bbox,
+            intersects=intersects,
+            contains=contains,
+            time=time,
+            limit=limit,
+            time_series=time_series,
+            **truncated_dict_data
+        )
 
     @staticmethod
     def validate_datetime_str(string: Optional[str]):
