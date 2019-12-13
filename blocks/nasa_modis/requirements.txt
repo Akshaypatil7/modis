@@ -11,3 +11,4 @@ pytest-pylint
 requests-mock
 Pillow
 xmltodict
+black

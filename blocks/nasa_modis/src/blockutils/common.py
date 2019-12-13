@@ -11,18 +11,17 @@ from .logging import get_logger
 logger = get_logger(__name__)
 
 
-
 def ensure_data_directories_exist():
-    pathlib.Path('/tmp/input/').mkdir(parents=True, exist_ok=True)
-    pathlib.Path('/tmp/output/').mkdir(parents=True, exist_ok=True)
-    pathlib.Path('/tmp/quicklooks/').mkdir(parents=True, exist_ok=True)
+    pathlib.Path("/tmp/input/").mkdir(parents=True, exist_ok=True)
+    pathlib.Path("/tmp/output/").mkdir(parents=True, exist_ok=True)
+    pathlib.Path("/tmp/quicklooks/").mkdir(parents=True, exist_ok=True)
 
 
 def load_query(validator=lambda x: True) -> STACQuery:
     """
     Get the query for the current task directly from the task parameters.
     """
-    data: str = os.environ.get("UP42_TASK_PARAMETERS", '{}')
+    data: str = os.environ.get("UP42_TASK_PARAMETERS", "{}")
     logger.debug("Raw task parameters from UP42_TASK_PARAMETERS are: %s", data)
     query_data = json.loads(data)
     return STACQuery.from_dict(query_data, validator)
@@ -32,7 +31,7 @@ def load_params() -> dict:
     """
     Get the parameters for the current task directly from the task parameters.
     """
-    data: str = os.environ.get("UP42_TASK_PARAMETERS", '{}')
+    data: str = os.environ.get("UP42_TASK_PARAMETERS", "{}")
     logger.debug("Fetching parameters for this block: %s", data)
     if data == "":
         data = "{}"
@@ -78,5 +77,5 @@ def get_block_mode() -> str:
     """
     value = os.environ.get("UP42_JOB_MODE", BlockModes.DEFAULT.value)
     if value not in [mode.value for mode in BlockModes]:
-        value = 'DEFAULT'
+        value = "DEFAULT"
     return value

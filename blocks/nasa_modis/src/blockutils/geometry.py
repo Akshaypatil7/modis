@@ -7,9 +7,10 @@ import mercantile
 import geojson
 import shapely
 
-def filter_tiles_intersect_with_geometry(tiles: List[mercantile.Tile],
-                                         geometry: geojson.geometry.Geometry) -> \
-                                            Generator[mercantile.Tile, None, None]:
+
+def filter_tiles_intersect_with_geometry(
+    tiles: List[mercantile.Tile], geometry: geojson.geometry.Geometry
+) -> Generator[mercantile.Tile, None, None]:
     """
     Given a list of WMTS tiles, this function filters out all tiles which don't intersect with the supplied geojson
     geometry

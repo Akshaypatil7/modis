@@ -11,7 +11,11 @@ from blockutils.stac import STACQuery
 from blockutils.logging import get_logger
 from blockutils.fetcher import AbstractFetcher, AbstractAOIClippedFetcher
 from blockutils.common import (
-    load_query, save_metadata, ensure_data_directories_exist, BlockModes, get_block_mode
+    load_query,
+    save_metadata,
+    ensure_data_directories_exist,
+    BlockModes,
+    get_block_mode,
 )
 
 from gibs import GibsAPI, extract_query_dates
@@ -41,9 +45,14 @@ class Modis:
             ensure_data_directories_exist()
 
             # Get the list of tiles that cover the query AOI. Sorted by (y, x) in ascending order
-            tile_list = list(filter_tiles_intersect_with_geometry( \
-                tiles=mercantile.tiles(*query.bounds(), zooms=query.zoom_level, truncate=True),
-                geometry=query.geometry()))
+            tile_list = list(
+                filter_tiles_intersect_with_geometry(
+                    tiles=mercantile.tiles(
+                        *query.bounds(), zooms=query.zoom_level, truncate=True
+                    ),
+                    geometry=query.geometry(),
+                )
+            )
 
             output_features: List[Feature] = []
 
@@ -58,8 +67,7 @@ class Modis:
             else:
                 raise ValueError(
                     "Invalid Layers. %r have invalid names."
-                    "%r are layer bounds, search should be within this." %
-                    invalid
+                    "%r are layer bounds, search should be within this." % invalid
                 )
 
             for query_date in date_list:
@@ -68,14 +76,22 @@ class Modis:
                     return_poly = unary_union(
                         [box(*tuple(mercantile.bounds(bbox))) for bbox in tile_list]
                     )
-                    feature = Feature(id=feature_id, bbox=return_poly.bounds, geometry=return_poly)
+                    feature = Feature(
+                        id=feature_id, bbox=return_poly.bounds, geometry=return_poly
+                    )
 
-                    self.api.write_quicklook(layer, return_poly.bounds, query_date, feature_id)
+                    self.api.write_quicklook(
+                        layer, return_poly.bounds, query_date, feature_id
+                    )
 
                 if not dry_run:
                     # Fetch tiles and patch them together
-                    self.api.get_merged_image(valid_imagery_layers, tile_list, query_date, feature_id)
-                    feature["properties"]["up42.data.aoiclipped"] = "%s.tif" % feature_id
+                    self.api.get_merged_image(
+                        valid_imagery_layers, tile_list, query_date, feature_id
+                    )
+                    feature["properties"]["up42.data.aoiclipped"] = (
+                        "%s.tif" % feature_id
+                    )
 
                 logger.debug(feature)
                 output_features.append(feature)
