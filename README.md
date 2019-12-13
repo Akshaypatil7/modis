@@ -171,12 +171,6 @@ Additionally, you can also update the file ``available_layers.json`` by running
 make available-layers
 ```
 
-## Support
-
-Open a **github issue** in this repository or send us an **email** at [support@up42.com](mailto:support@up42.com),
-we are happy to answer your questions!
-
-## Questions and suggestions
+## Support, questions and suggestions
 
 Open a **github issue** in this repository; we are happy to answer your questions!
-
