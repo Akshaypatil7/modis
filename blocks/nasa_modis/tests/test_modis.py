@@ -347,6 +347,7 @@ def test_aoiclipped_fetcher_virs_fetch_live():
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]["id"])
 
 
+@pytest.mark.live
 def test_aoiclipped_fetcher_rio_tags_fetch_live():
     """
     Unmocked ("live") test for fetching MODIS and VIRS data with tags

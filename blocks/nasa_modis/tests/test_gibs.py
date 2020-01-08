@@ -251,18 +251,12 @@ def test_download_wmts_tile_as_geotiff(requests_mock):
         "height": 256,
         "count": 3,
         "crs": CRS.from_dict(init="epsg:3857"),
-        "transform": Affine(
-            305.74811314070394,
-            0.0,
-            2661231.5767766964,
-            0.0,
-            -305.7481131407094,
-            -3443946.746416901,
-        ),
     }
 
     with rio.open(result) as dataset:
-        assert dataset.meta == expected_meta
+        meta = dataset.meta
+        meta.pop("transform")
+        assert meta == expected_meta
 
 
 @pytest.mark.live
