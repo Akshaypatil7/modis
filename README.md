@@ -45,13 +45,13 @@ First create a new virtual environment called `up42-nasa`, for example by using
 [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/):
 
 ```bash
-mkvirtualenv --python=$(which python3.7) up42-nasa
+mkvirtualenv --python=$(which python3.7) up42-modis
 ```
 
 Activate the new environment:
 
 ```bash
-workon up42-nasa
+workon up42-modis
 ```
 
 Install the necessary Python libraries via:
