@@ -1,9 +1,8 @@
 ## Configuration for Makefile.
-SRC := blocks/nasa_modis
 UP42_DOCKERFILE := Dockerfile
 DOCKER_TAG := nasa-modis
 DOCKER_VERSION := latest
-UP42_MANIFEST := $(SRC)/UP42Manifest.json
+UP42_MANIFEST := UP42Manifest.json
 
 VALIDATE_ENDPOINT := https://api.up42.com/validate-schema/block
 REGISTRY := registry.up42.com
@@ -12,11 +11,10 @@ install:
 	pip install -r requirements.txt
 
 test:
-	black .
-	python -m pytest --pylint --pylint-rcfile=pylintrc --mypy --mypy-ignore-missing-imports --cov=src/
+	bash test.sh
 
 test[live]:
-	python -m pytest --pylint --pylint-rcfile=pylintrc --mypy --mypy-ignore-missing-imports --cov=src/ --runlive
+	bash test.sh --live
 
 clean:
 	find . -name "__pycache__" -exec rm -rf {} +
