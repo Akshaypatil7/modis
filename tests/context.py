@@ -10,7 +10,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
-from modis import Modis
-from gibs import GibsAPI, extract_query_dates, make_list_layer_band
-from blockutils.stac import STACQuery
-from blockutils.common import ensure_data_directories_exist
+from src.modis import Modis
+from src.gibs import GibsAPI, extract_query_dates, make_list_layer_band
+from src.blockutils.stac import STACQuery
+from src.blockutils.common import ensure_data_directories_exist
