@@ -23,7 +23,7 @@ clean:
 	find . -name ".coverage" -exec rm -f {} +
 
 validate:
-	cd blocks/nasa_modis;	curl -X POST -H 'Content-Type: application/json' -d @UP42Manifest.json $(VALIDATE_ENDPOINT)
+	curl -X POST -H 'Content-Type: application/json' -d @UP42Manifest.json $(VALIDATE_ENDPOINT)
 
 build:
 ifdef UID
