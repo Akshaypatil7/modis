@@ -1,4 +1,5 @@
 # Data block example: MODIS AOI-Clipped
+![coverage](coverage.svg)
 ## Introduction
 
 This is an example data block based on NASA's [Global Imagery Browse Services (GIBS)](https://earthdata.nasa.gov/eosdis/science-system-description/eosdis-components/gibs) providing access to three-band

@@ -42,6 +42,6 @@ e2e:
 	python e2e.py
 
 available-layers:
-	python blocks/nasa_modis/src/available_layers.py
+	python src/available_layers.py
 
 .PHONY: build login push test install e2e available-layers push login

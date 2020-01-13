@@ -12,3 +12,4 @@ requests-mock
 Pillow
 xmltodict
 black
+coverage-badge

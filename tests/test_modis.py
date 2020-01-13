@@ -308,7 +308,7 @@ def test_aoiclipped_fetcher_fetch_live():
     )
     with rio.open(img_filename) as dataset:
         band2 = dataset.read(2)
-        assert np.sum(band2) == 28360474
+        assert np.sum(band2) == 28351388
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]["id"])
 
 
@@ -342,7 +342,7 @@ def test_aoiclipped_fetcher_virs_fetch_live():
     )
     with rio.open(img_filename) as dataset:
         band1 = dataset.read(1)
-        assert np.sum(band1) == 45230078
+        assert np.sum(band1) == 45232508
         assert dataset.count == 1
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]["id"])
 
@@ -381,7 +381,7 @@ def test_aoiclipped_fetcher_rio_tags_fetch_live():
     with rio.open(img_filename) as dataset:
         assert dataset.count == 4
         band1 = dataset.read(1)
-        assert np.sum(band1) == 29581152
+        assert np.sum(band1) == 29570538
 
         assert dataset.tags(1)["layer"] == "MODIS_Terra_CorrectedReflectance_TrueColor"
         assert dataset.tags(1)["band"] == str(1)
@@ -425,7 +425,7 @@ def test_aoiclipped_fetcher_multiple_fetch_live():
     )
     with rio.open(img_filename) as dataset:
         band2 = dataset.read(2)
-        assert np.sum(band2) == 28360474
+        assert np.sum(band2) == 28351388
         assert dataset.count == 6
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]["id"])
 

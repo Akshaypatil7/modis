@@ -1,0 +1,272 @@
+{
+  "Coastlines": {
+    "Identifier": "Coastlines",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "Landsat_WELD_CorrectedReflectance_TrueColor_Alaska_Annual": {
+    "Identifier": "Landsat_WELD_CorrectedReflectance_TrueColor_Alaska_Annual",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  },
+  "Landsat_WELD_CorrectedReflectance_TrueColor_Alaska_Monthly": {
+    "Identifier": "Landsat_WELD_CorrectedReflectance_TrueColor_Alaska_Monthly",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  },
+  "Landsat_WELD_CorrectedReflectance_TrueColor_Alaska_Seasonal": {
+    "Identifier": "Landsat_WELD_CorrectedReflectance_TrueColor_Alaska_Seasonal",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  },
+  "Landsat_WELD_CorrectedReflectance_TrueColor_CONUS_Annual": {
+    "Identifier": "Landsat_WELD_CorrectedReflectance_TrueColor_CONUS_Annual",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  },
+  "Landsat_WELD_CorrectedReflectance_TrueColor_CONUS_Monthly": {
+    "Identifier": "Landsat_WELD_CorrectedReflectance_TrueColor_CONUS_Monthly",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  },
+  "Landsat_WELD_CorrectedReflectance_TrueColor_CONUS_Seasonal": {
+    "Identifier": "Landsat_WELD_CorrectedReflectance_TrueColor_CONUS_Seasonal",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  },
+  "MISR_AM1_Ellipsoid_Radiance_NGB_AN": {
+    "Identifier": "MISR_AM1_Ellipsoid_Radiance_NGB_AN",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MISR_AM1_Ellipsoid_Radiance_RGB_AA": {
+    "Identifier": "MISR_AM1_Ellipsoid_Radiance_RGB_AA",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MISR_AM1_Ellipsoid_Radiance_RGB_AF": {
+    "Identifier": "MISR_AM1_Ellipsoid_Radiance_RGB_AF",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MISR_AM1_Ellipsoid_Radiance_RGB_AN": {
+    "Identifier": "MISR_AM1_Ellipsoid_Radiance_RGB_AN",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MISR_AM1_Ellipsoid_Radiance_RGB_BA": {
+    "Identifier": "MISR_AM1_Ellipsoid_Radiance_RGB_BA",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MISR_AM1_Ellipsoid_Radiance_RGB_BF": {
+    "Identifier": "MISR_AM1_Ellipsoid_Radiance_RGB_BF",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MISR_AM1_Ellipsoid_Radiance_RGB_CA": {
+    "Identifier": "MISR_AM1_Ellipsoid_Radiance_RGB_CA",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MISR_AM1_Ellipsoid_Radiance_RGB_CF": {
+    "Identifier": "MISR_AM1_Ellipsoid_Radiance_RGB_CF",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MISR_AM1_Ellipsoid_Radiance_RGB_DA": {
+    "Identifier": "MISR_AM1_Ellipsoid_Radiance_RGB_DA",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MISR_AM1_Ellipsoid_Radiance_RGB_DF": {
+    "Identifier": "MISR_AM1_Ellipsoid_Radiance_RGB_DF",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MODIS_Aqua_CorrectedReflectance_Bands721": {
+    "Identifier": "MODIS_Aqua_CorrectedReflectance_Bands721",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  },
+  "MODIS_Aqua_CorrectedReflectance_TrueColor": {
+    "Identifier": "MODIS_Aqua_CorrectedReflectance_TrueColor",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  },
+  "MODIS_Aqua_Data_No_Data": {
+    "Identifier": "MODIS_Aqua_Data_No_Data",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MODIS_Aqua_L3_EVI_16Day": {
+    "Identifier": "MODIS_Aqua_L3_EVI_16Day",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MODIS_Aqua_L3_NDVI_16Day": {
+    "Identifier": "MODIS_Aqua_L3_NDVI_16Day",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MODIS_Aqua_L3_SurfaceReflectance_Bands121_8Day": {
+    "Identifier": "MODIS_Aqua_L3_SurfaceReflectance_Bands121_8Day",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  },
+  "MODIS_Aqua_SurfaceReflectance_Bands121": {
+    "Identifier": "MODIS_Aqua_SurfaceReflectance_Bands121",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  },
+  "MODIS_Terra_CorrectedReflectance_Bands367": {
+    "Identifier": "MODIS_Terra_CorrectedReflectance_Bands367",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  },
+  "MODIS_Terra_CorrectedReflectance_Bands721": {
+    "Identifier": "MODIS_Terra_CorrectedReflectance_Bands721",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  },
+  "MODIS_Terra_CorrectedReflectance_TrueColor": {
+    "Identifier": "MODIS_Terra_CorrectedReflectance_TrueColor",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  },
+  "MODIS_Terra_Data_No_Data": {
+    "Identifier": "MODIS_Terra_Data_No_Data",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MODIS_Terra_EVI_8Day": {
+    "Identifier": "MODIS_Terra_EVI_8Day",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MODIS_Terra_L3_EVI_16Day": {
+    "Identifier": "MODIS_Terra_L3_EVI_16Day",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MODIS_Terra_L3_Land_Water_Mask": {
+    "Identifier": "MODIS_Terra_L3_Land_Water_Mask",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MODIS_Terra_L3_NDVI_16Day": {
+    "Identifier": "MODIS_Terra_L3_NDVI_16Day",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MODIS_Terra_L3_SurfaceReflectance_Bands121_8Day": {
+    "Identifier": "MODIS_Terra_L3_SurfaceReflectance_Bands121_8Day",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  },
+  "MODIS_Terra_NDVI_8Day": {
+    "Identifier": "MODIS_Terra_NDVI_8Day",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "MODIS_Terra_SurfaceReflectance_Bands121": {
+    "Identifier": "MODIS_Terra_SurfaceReflectance_Bands121",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  },
+  "MODIS_Water_Mask": {
+    "Identifier": "MODIS_Water_Mask",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "OSM_Land_Mask": {
+    "Identifier": "OSM_Land_Mask",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "OSM_Land_Water_Map": {
+    "Identifier": "OSM_Land_Water_Map",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "Reference_Features": {
+    "Identifier": "Reference_Features",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "Reference_Labels": {
+    "Identifier": "Reference_Labels",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "VIIRS_SNPP_Brightness_Temp_BandI5_Day": {
+    "Identifier": "VIIRS_SNPP_Brightness_Temp_BandI5_Day",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "VIIRS_SNPP_Brightness_Temp_BandI5_Night": {
+    "Identifier": "VIIRS_SNPP_Brightness_Temp_BandI5_Night",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "png"
+  },
+  "VIIRS_SNPP_CorrectedReflectance_BandsM11-I2-I1": {
+    "Identifier": "VIIRS_SNPP_CorrectedReflectance_BandsM11-I2-I1",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  },
+  "VIIRS_SNPP_CorrectedReflectance_BandsM3-I3-M11": {
+    "Identifier": "VIIRS_SNPP_CorrectedReflectance_BandsM3-I3-M11",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  },
+  "VIIRS_SNPP_CorrectedReflectance_TrueColor": {
+    "Identifier": "VIIRS_SNPP_CorrectedReflectance_TrueColor",
+    "TileMatrixSet": "GoogleMapsCompatible_Level9",
+    "WGS84BoundingBox": "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))",
+    "Format": "jpeg"
+  }
+}
