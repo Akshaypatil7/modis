@@ -37,11 +37,7 @@
           "dtype": "uint8"
         },
         "custom": {
-          "imagery_layers": [
-            "${imagery_layers}"
-          ],
-          "provider": "NASA",
-          "imagery_type": "satellite"
+          "imagery_layers": "${imagery_layers}"
         }
     }
   }
