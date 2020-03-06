@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     IMG_FILENAME = "%s/%s" % (
         str(OUTPUT_DIR / "output"),
-        FEATURE_COLLECTION.features[0]["properties"]["up42.data.aoiclipped"],
+        FEATURE_COLLECTION.features[0]["properties"]["up42.data_path"],
     )
     with rio.open(IMG_FILENAME) as dataset:
         META = dataset.meta

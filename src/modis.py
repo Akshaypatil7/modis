@@ -89,9 +89,7 @@ class Modis:
                     self.api.get_merged_image(
                         valid_imagery_layers, tile_list, query_date, feature_id
                     )
-                    feature["properties"]["up42.data.aoiclipped"] = (
-                        "%s.tif" % feature_id
-                    )
+                    feature["properties"]["up42.data_path"] = "%s.tif" % feature_id
 
                 logger.debug(feature)
                 output_features.append(feature)

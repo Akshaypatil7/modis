@@ -38,7 +38,7 @@ def test_aoiclipped_fetcher_fetch_in_dry_run_mode():
     result = Modis.AOIClippedFetcher().fetch(query, dry_run=True)
 
     assert len(result.features) == 1
-    assert "up42.data.aoiclipped" not in result.features[0]["properties"].keys()
+    assert "up42.data_path" not in result.features[0]["properties"].keys()
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]["id"])
 
 
@@ -69,7 +69,7 @@ def test_aoiclipped_fetcher_multiple_fetch_in_dry_run_mode():
     result = Modis.AOIClippedFetcher().fetch(query, dry_run=True)
 
     assert len(result.features) == 1
-    assert "up42.data.aoiclipped" not in result.features[0]["properties"].keys()
+    assert "up42.data_path" not in result.features[0]["properties"].keys()
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]["id"])
 
 
@@ -167,9 +167,7 @@ def test_aoiclipped_fetcher_fetch(requests_mock):
 
     assert len(result.features) == 1
 
-    img_filename = (
-        "/tmp/output/%s" % result.features[0]["properties"]["up42.data.aoiclipped"]
-    )
+    img_filename = "/tmp/output/%s" % result.features[0]["properties"]["up42.data_path"]
     with rio.open(img_filename) as dataset:
         band2 = dataset.read(2)
         assert np.sum(band2) == 7954025
@@ -303,9 +301,7 @@ def test_aoiclipped_fetcher_fetch_live():
 
     assert len(result.features) == 2
 
-    img_filename = (
-        "/tmp/output/%s" % result.features[0]["properties"]["up42.data.aoiclipped"]
-    )
+    img_filename = "/tmp/output/%s" % result.features[0]["properties"]["up42.data_path"]
     with rio.open(img_filename) as dataset:
         band2 = dataset.read(2)
         assert np.sum(band2) == 28351388
@@ -337,9 +333,7 @@ def test_aoiclipped_fetcher_virs_fetch_live():
 
     assert len(result.features) == 2
 
-    img_filename = (
-        "/tmp/output/%s" % result.features[0]["properties"]["up42.data.aoiclipped"]
-    )
+    img_filename = "/tmp/output/%s" % result.features[0]["properties"]["up42.data_path"]
     with rio.open(img_filename) as dataset:
         band1 = dataset.read(1)
         assert np.sum(band1) == 45232508
@@ -375,9 +369,7 @@ def test_aoiclipped_fetcher_rio_tags_fetch_live():
 
     assert len(result.features) == 2
 
-    img_filename = (
-        "/tmp/output/%s" % result.features[0]["properties"]["up42.data.aoiclipped"]
-    )
+    img_filename = "/tmp/output/%s" % result.features[0]["properties"]["up42.data_path"]
     with rio.open(img_filename) as dataset:
         assert dataset.count == 4
         band1 = dataset.read(1)
@@ -420,9 +412,7 @@ def test_aoiclipped_fetcher_multiple_fetch_live():
 
     assert len(result.features) == 2
 
-    img_filename = (
-        "/tmp/output/%s" % result.features[0]["properties"]["up42.data.aoiclipped"]
-    )
+    img_filename = "/tmp/output/%s" % result.features[0]["properties"]["up42.data_path"]
     with rio.open(img_filename) as dataset:
         band2 = dataset.read(2)
         assert np.sum(band2) == 28351388
