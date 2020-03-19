@@ -1,6 +1,9 @@
 ### Dockerfile to build modis block.
 
 FROM up42/up42-base-py37:latest
+
+RUN sed -i 's/MinProtocol = */MinProtocol = None/' /etc/ssl/openssl.cnf
+RUN sed -i 's/CipherString = */CipherString = DEFAULT/' /etc/ssl/openssl.cnf
 ARG manifest
 LABEL "up42_manifest"=$manifest
 
