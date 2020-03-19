@@ -1,6 +1,6 @@
 ### Dockerfile to build modis block.
 
-FROM python:3.7.1-stretch
+FROM up42/up42-base-py37:latest
 ARG manifest
 LABEL "up42_manifest"=$manifest
 
