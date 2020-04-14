@@ -267,7 +267,7 @@ def test_aoiclipped_dry_run_error_geom_fetcher_fetch(requests_mock):
             "zoom_level": 9,
             "time": "2018-11-01T16:40:49+00:00/2018-11-20T16:41:49+00:00",
             "limit": 1,
-            "bbox": [200, 200, 210, 210],
+            "bbox": [179, 89, 180, 90],
             "imagery_layers": ["MODIS_Terra_CorrectedReflectance_TrueColor"],
         }
     )
