@@ -4,6 +4,7 @@ from typing import List
 import mercantile
 from geojson import Feature, FeatureCollection
 import requests
+from mercantile import MercantileError
 from shapely.geometry import box
 from shapely.ops import unary_union
 
@@ -47,14 +48,17 @@ class Modis:
             ensure_data_directories_exist()
 
             # Get the list of tiles that cover the query AOI. Sorted by (y, x) in ascending order
-            tile_list = list(
-                filter_tiles_intersect_with_geometry(
-                    tiles=mercantile.tiles(
-                        *query.bounds(), zooms=query.zoom_level, truncate=True
-                    ),
-                    geometry=query.geometry(),
+            try:
+                tile_list = list(
+                    filter_tiles_intersect_with_geometry(
+                        tiles=mercantile.tiles(
+                            *query.bounds(), zooms=query.zoom_level, truncate=True
+                        ),
+                        geometry=query.geometry(),
+                    )
                 )
-            )
+            except MercantileError:
+                raise UP42Error(SupportedErrors.INPUT_PARAMETERS_ERROR)
 
             output_features: List[Feature] = []
 
