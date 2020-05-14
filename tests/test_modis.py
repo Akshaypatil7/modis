@@ -11,6 +11,8 @@ import numpy as np
 import requests_mock as mock
 import pytest
 
+from blockutils.exceptions import UP42Error, SupportedErrors
+
 from context import STACQuery, Modis
 
 
@@ -97,7 +99,7 @@ def test_aoiclipped_fetcher_layer_error_fetch_in_dry_run_mode():
         }
     )
 
-    with pytest.raises(ValueError, match=r".*['AN_ERROR_FOR_SURE'].*"):
+    with pytest.raises(UP42Error, match=r".*['AN_ERROR_FOR_SURE'].*"):
         Modis.AOIClippedFetcher().fetch(query, dry_run=True)
 
 
@@ -117,7 +119,7 @@ def test_aoiclipped_fetcher_geom_error_fetch_in_dry_run_mode():
         }
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(UP42Error):
         Modis.AOIClippedFetcher().fetch(query, dry_run=True)
 
 
@@ -204,7 +206,7 @@ def test_aoiclipped_dry_run_error_name_fetcher_fetch(requests_mock):
         }
     )
 
-    with pytest.raises(ValueError, match=r".*['AN_ERROR_FOR_SURE'].*"):
+    with pytest.raises(UP42Error, match=r".*['AN_ERROR_FOR_SURE'].*"):
         Modis.AOIClippedFetcher().fetch(query, dry_run=True)
 
 
@@ -243,7 +245,7 @@ def test_aoiclipped_dry_run_multiple_error_name_fetcher_fetch(requests_mock):
         }
     )
 
-    with pytest.raises(ValueError, match=r".*['12345','AN_ERROR_FOR_SURE'].*"):
+    with pytest.raises(UP42Error, match=r".*['12345','AN_ERROR_FOR_SURE'].*"):
         Modis.AOIClippedFetcher().fetch(query, dry_run=True)
 
 
@@ -272,7 +274,7 @@ def test_aoiclipped_dry_run_error_geom_fetcher_fetch(requests_mock):
         }
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(UP42Error):
         Modis.AOIClippedFetcher().fetch(query, dry_run=True)
 
 
@@ -444,7 +446,7 @@ def test_aoiclipped_fetcher_layer_error_fetch_live():
         }
     )
 
-    with pytest.raises(ValueError, match=r".*['AN_ERROR_FOR_SURE'].*"):
+    with pytest.raises(UP42Error, match=r".*['AN_ERROR_FOR_SURE'].*"):
         Modis.AOIClippedFetcher().fetch(query, dry_run=False)
 
 
@@ -464,5 +466,5 @@ def test_aoiclipped_fetcher_geom_error_fetch_live():
         }
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(UP42Error):
         Modis.AOIClippedFetcher().fetch(query, dry_run=False)

@@ -13,7 +13,7 @@ from rasterio.transform import Affine
 from PIL import Image
 
 import requests_mock as mock
-
+from blockutils.common import meta_is_equal
 from context import (
     GibsAPI,
     extract_query_dates,
@@ -302,7 +302,7 @@ def test_get_merged_image():
     }
 
     with rio.open(str(result_filename)) as dataset:
-        assert dataset.meta == expected_meta
+        assert meta_is_equal(dataset.meta, expected_meta)
 
 
 @pytest.mark.live
@@ -354,7 +354,7 @@ def test_get_multiple_merged_image():
     }
 
     with rio.open(str(result_filename)) as dataset:
-        assert dataset.meta == expected_meta
+        assert meta_is_equal(dataset.meta, expected_meta, atol=1e-02)
 
 
 @pytest.mark.live
