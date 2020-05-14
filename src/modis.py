@@ -3,6 +3,7 @@ from typing import List
 
 import mercantile
 from geojson import Feature, FeatureCollection
+import requests
 from shapely.geometry import box
 from shapely.ops import unary_union
 
@@ -17,6 +18,7 @@ from blockutils.fetcher import AbstractAOIClippedFetcher, AbstractFetcher
 from blockutils.geometry import filter_tiles_intersect_with_geometry
 from blockutils.logging import get_logger
 from blockutils.stac import STACQuery
+from blockutils.exceptions import UP42Error, SupportedErrors, catch_exceptions
 from gibs import GibsAPI, extract_query_dates
 
 logger = get_logger(__name__)
@@ -27,6 +29,7 @@ class Modis:
     DEFAULT_ZOOM_LEVEL = 9
 
     @staticmethod
+    @catch_exceptions(logger)
     def run(fetcher: AbstractFetcher):
         query: STACQuery = load_query()
         query.set_param_if_not_exists("zoom_level", Modis.DEFAULT_ZOOM_LEVEL)
@@ -64,9 +67,10 @@ class Modis:
             if are_valid:
                 logger.debug("Layers %r OK!", query.imagery_layers)
             else:
-                raise ValueError(
+                raise UP42Error(
+                    SupportedErrors.INPUT_PARAMETERS_ERROR,
                     "Invalid Layers. %r have invalid names."
-                    "%r are layer bounds, search should be within this." % invalid
+                    "%r are layer bounds, search should be within this." % invalid,
                 )
 
             for query_date in date_list:
@@ -79,16 +83,25 @@ class Modis:
                         id=feature_id, bbox=return_poly.bounds, geometry=return_poly
                     )
 
-                    self.api.write_quicklook(
-                        layer, return_poly.bounds, query_date, feature_id
-                    )
+                    try:
+                        self.api.write_quicklook(
+                            layer, return_poly.bounds, query_date, feature_id
+                        )
+                    except requests.exceptions.HTTPError:
+                        continue
 
                 if not dry_run:
                     # Fetch tiles and patch them together
-                    self.api.get_merged_image(
-                        valid_imagery_layers, tile_list, query_date, feature_id
-                    )
-                    feature["properties"]["up42.data_path"] = "%s.tif" % feature_id
+                    try:
+                        self.api.get_merged_image(
+                            valid_imagery_layers, tile_list, query_date, feature_id
+                        )
+                        feature["properties"]["up42.data_path"] = "%s.tif" % feature_id
+                    except requests.exceptions.HTTPError:
+                        raise UP42Error(
+                            SupportedErrors.API_CONNECTION_ERROR,
+                            message="Failed to get merged Image",
+                        )
 
                 logger.debug(feature)
                 output_features.append(feature)
