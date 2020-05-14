@@ -1,23 +1,22 @@
 import uuid
 from typing import List
 
-from geojson import FeatureCollection, Feature
 import mercantile
-from shapely.ops import unary_union
+from geojson import Feature, FeatureCollection
 from shapely.geometry import box
+from shapely.ops import unary_union
 
-from blockutils.geometry import filter_tiles_intersect_with_geometry
-from blockutils.stac import STACQuery
-from blockutils.logging import get_logger
-from blockutils.fetcher import AbstractFetcher, AbstractAOIClippedFetcher
 from blockutils.common import (
+    BlockModes,
+    ensure_data_directories_exist,
+    get_block_mode,
     load_query,
     save_metadata,
-    ensure_data_directories_exist,
-    BlockModes,
-    get_block_mode,
 )
-
+from blockutils.fetcher import AbstractAOIClippedFetcher, AbstractFetcher
+from blockutils.geometry import filter_tiles_intersect_with_geometry
+from blockutils.logging import get_logger
+from blockutils.stac import STACQuery
 from gibs import GibsAPI, extract_query_dates
 
 logger = get_logger(__name__)

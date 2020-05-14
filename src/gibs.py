@@ -1,21 +1,20 @@
-from typing import IO, Any, List, Tuple
-from io import BytesIO
-import tempfile
-import datetime
-from datetime import timedelta
-from pathlib import Path
 import collections
+import datetime
+import tempfile
+from datetime import timedelta
+from io import BytesIO
+from pathlib import Path
+from typing import IO, Any, List, Tuple
 
-
-from dateutil import parser
-import requests
-from requests import Response
 import mercantile
-import rasterio as rio
-from rasterio.merge import merge
 import numpy as np
-from shapely.geometry import box
+import rasterio as rio
+import requests
 import xmltodict
+from dateutil import parser
+from rasterio.merge import merge
+from requests import Response
+from shapely.geometry import box
 
 from blockutils.logging import get_logger
 from blockutils.stac import STACQuery
