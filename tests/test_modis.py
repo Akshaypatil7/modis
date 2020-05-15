@@ -1,7 +1,7 @@
 """
 Integration tests for the higher-level fetch methods
 """
-# pylint: disable=unused-import
+# pylint: disable=unused-import, redefined-outer-name
 # requests_mock used as fixture in tests
 import os
 import re
@@ -16,8 +16,13 @@ from blockutils.exceptions import UP42Error, SupportedErrors
 from context import STACQuery, Modis
 
 
+@pytest.fixture()
+def modis_instance():
+    return Modis(default_zoom_level=9)
+
+
 @pytest.mark.live
-def test_aoiclipped_fetcher_fetch_in_dry_run_mode():
+def test_aoiclipped_fetcher_fetch_in_dry_run_mode(modis_instance):
     """
     Test for dry-run mode i.e. only metadata is returned
     """
@@ -37,7 +42,7 @@ def test_aoiclipped_fetcher_fetch_in_dry_run_mode():
         }
     )
 
-    result = Modis.AOIClippedFetcher().fetch(query, dry_run=True)
+    result = modis_instance.fetch(query, dry_run=True)
 
     assert len(result.features) == 1
     assert "up42.data_path" not in result.features[0]["properties"].keys()
@@ -45,7 +50,7 @@ def test_aoiclipped_fetcher_fetch_in_dry_run_mode():
 
 
 @pytest.mark.live
-def test_aoiclipped_fetcher_multiple_fetch_in_dry_run_mode():
+def test_aoiclipped_fetcher_multiple_fetch_in_dry_run_mode(modis_instance):
     """
     Test for dry-run mode i.e. only metadata is returned, multiple imagery_layers
     """
@@ -68,7 +73,7 @@ def test_aoiclipped_fetcher_multiple_fetch_in_dry_run_mode():
         }
     )
 
-    result = Modis.AOIClippedFetcher().fetch(query, dry_run=True)
+    result = modis_instance.fetch(query, dry_run=True)
 
     assert len(result.features) == 1
     assert "up42.data_path" not in result.features[0]["properties"].keys()
@@ -76,7 +81,7 @@ def test_aoiclipped_fetcher_multiple_fetch_in_dry_run_mode():
 
 
 @pytest.mark.live
-def test_aoiclipped_fetcher_layer_error_fetch_in_dry_run_mode():
+def test_aoiclipped_fetcher_layer_error_fetch_in_dry_run_mode(modis_instance):
     """
     Test for dry-run mode i.e. only metadata is returned, error in name of layer
     """
@@ -100,11 +105,11 @@ def test_aoiclipped_fetcher_layer_error_fetch_in_dry_run_mode():
     )
 
     with pytest.raises(UP42Error, match=r".*['AN_ERROR_FOR_SURE'].*"):
-        Modis.AOIClippedFetcher().fetch(query, dry_run=True)
+        modis_instance.fetch(query, dry_run=True)
 
 
 @pytest.mark.live
-def test_aoiclipped_fetcher_geom_error_fetch_in_dry_run_mode():
+def test_aoiclipped_fetcher_geom_error_fetch_in_dry_run_mode(modis_instance):
     """
     Test for dry-run mode i.e. only metadata is returned, error in geometry
     """
@@ -120,10 +125,10 @@ def test_aoiclipped_fetcher_geom_error_fetch_in_dry_run_mode():
     )
 
     with pytest.raises(UP42Error):
-        Modis.AOIClippedFetcher().fetch(query, dry_run=True)
+        modis_instance.fetch(query, dry_run=True)
 
 
-def test_aoiclipped_fetcher_fetch(requests_mock):
+def test_aoiclipped_fetcher_fetch(requests_mock, modis_instance):
     """
     Mocked test for fetching data - quicker than the live one and therefore valuable for testing
     purposes
@@ -165,7 +170,7 @@ def test_aoiclipped_fetcher_fetch(requests_mock):
         }
     )
 
-    result = Modis.AOIClippedFetcher().fetch(query, dry_run=False)
+    result = modis_instance.fetch(query, dry_run=False)
 
     assert len(result.features) == 1
 
@@ -176,7 +181,7 @@ def test_aoiclipped_fetcher_fetch(requests_mock):
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]["id"])
 
 
-def test_aoiclipped_dry_run_error_name_fetcher_fetch(requests_mock):
+def test_aoiclipped_dry_run_error_name_fetcher_fetch(requests_mock, modis_instance):
     """
     Mocked test for fetching data with error in name
     """
@@ -207,10 +212,12 @@ def test_aoiclipped_dry_run_error_name_fetcher_fetch(requests_mock):
     )
 
     with pytest.raises(UP42Error, match=r".*['AN_ERROR_FOR_SURE'].*"):
-        Modis.AOIClippedFetcher().fetch(query, dry_run=True)
+        modis_instance.fetch(query, dry_run=True)
 
 
-def test_aoiclipped_dry_run_multiple_error_name_fetcher_fetch(requests_mock):
+def test_aoiclipped_dry_run_multiple_error_name_fetcher_fetch(
+    requests_mock, modis_instance
+):
     """
     Mocked test for fetching data with error in name
     """
@@ -246,10 +253,10 @@ def test_aoiclipped_dry_run_multiple_error_name_fetcher_fetch(requests_mock):
     )
 
     with pytest.raises(UP42Error, match=r".*['12345','AN_ERROR_FOR_SURE'].*"):
-        Modis.AOIClippedFetcher().fetch(query, dry_run=True)
+        modis_instance.fetch(query, dry_run=True)
 
 
-def test_aoiclipped_dry_run_error_geom_fetcher_fetch(requests_mock):
+def test_aoiclipped_dry_run_error_geom_fetcher_fetch(requests_mock, modis_instance):
     """
     Mocked test for fetching data with error in geom
     """
@@ -275,11 +282,11 @@ def test_aoiclipped_dry_run_error_geom_fetcher_fetch(requests_mock):
     )
 
     with pytest.raises(UP42Error):
-        Modis.AOIClippedFetcher().fetch(query, dry_run=True)
+        modis_instance.fetch(query, dry_run=True)
 
 
 @pytest.mark.live
-def test_aoiclipped_fetcher_fetch_live():
+def test_aoiclipped_fetcher_fetch_live(modis_instance):
     """
     Unmocked ("live") test for fetching data
     """
@@ -299,7 +306,7 @@ def test_aoiclipped_fetcher_fetch_live():
         }
     )
 
-    result = Modis.AOIClippedFetcher().fetch(query, dry_run=False)
+    result = modis_instance.fetch(query, dry_run=False)
 
     assert len(result.features) == 2
 
@@ -311,7 +318,7 @@ def test_aoiclipped_fetcher_fetch_live():
 
 
 @pytest.mark.live
-def test_aoiclipped_fetcher_virs_fetch_live():
+def test_aoiclipped_fetcher_virs_fetch_live(modis_instance):
     """
     Unmocked ("live") test for fetching VIIRS data in png
     """
@@ -331,7 +338,7 @@ def test_aoiclipped_fetcher_virs_fetch_live():
         }
     )
 
-    result = Modis.AOIClippedFetcher().fetch(query, dry_run=False)
+    result = modis_instance.fetch(query, dry_run=False)
 
     assert len(result.features) == 2
 
@@ -344,7 +351,7 @@ def test_aoiclipped_fetcher_virs_fetch_live():
 
 
 @pytest.mark.live
-def test_aoiclipped_fetcher_rio_tags_fetch_live():
+def test_aoiclipped_fetcher_rio_tags_fetch_live(modis_instance):
     """
     Unmocked ("live") test for fetching MODIS and VIRS data with tags
     """
@@ -367,7 +374,7 @@ def test_aoiclipped_fetcher_rio_tags_fetch_live():
         }
     )
 
-    result = Modis.AOIClippedFetcher().fetch(query, dry_run=False)
+    result = modis_instance.fetch(query, dry_run=False)
 
     assert len(result.features) == 2
 
@@ -387,7 +394,7 @@ def test_aoiclipped_fetcher_rio_tags_fetch_live():
 
 
 @pytest.mark.live
-def test_aoiclipped_fetcher_multiple_fetch_live():
+def test_aoiclipped_fetcher_multiple_fetch_live(modis_instance):
     """
     Unmocked ("live") test for fetching data, multiple imagery_layers
     """
@@ -410,7 +417,7 @@ def test_aoiclipped_fetcher_multiple_fetch_live():
         }
     )
 
-    result = Modis.AOIClippedFetcher().fetch(query, dry_run=False)
+    result = modis_instance.fetch(query, dry_run=False)
 
     assert len(result.features) == 2
 
@@ -423,7 +430,7 @@ def test_aoiclipped_fetcher_multiple_fetch_live():
 
 
 @pytest.mark.live
-def test_aoiclipped_fetcher_layer_error_fetch_live():
+def test_aoiclipped_fetcher_layer_error_fetch_live(modis_instance):
     """
     Unmocked ("live") test for fetching data, error in name of layer
     """
@@ -447,11 +454,11 @@ def test_aoiclipped_fetcher_layer_error_fetch_live():
     )
 
     with pytest.raises(UP42Error, match=r".*['AN_ERROR_FOR_SURE'].*"):
-        Modis.AOIClippedFetcher().fetch(query, dry_run=False)
+        modis_instance.fetch(query, dry_run=False)
 
 
 @pytest.mark.live
-def test_aoiclipped_fetcher_geom_error_fetch_live():
+def test_aoiclipped_fetcher_geom_error_fetch_live(modis_instance):
     """
     Unmocked ("live") test for fetching data, error in geometry of layer
     """
@@ -467,4 +474,4 @@ def test_aoiclipped_fetcher_geom_error_fetch_live():
     )
 
     with pytest.raises(UP42Error):
-        Modis.AOIClippedFetcher().fetch(query, dry_run=False)
+        modis_instance.fetch(query, dry_run=False)
