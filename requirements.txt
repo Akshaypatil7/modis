@@ -13,3 +13,4 @@ Pillow
 xmltodict
 black
 coverage-badge
+up42-blockutils

@@ -1,21 +1,20 @@
-from typing import IO, Any, List, Tuple
-from io import BytesIO
-import tempfile
-import datetime
-from datetime import timedelta
-from pathlib import Path
 import collections
+import datetime
+import tempfile
+from datetime import timedelta
+from io import BytesIO
+from pathlib import Path
+from typing import IO, Any, List, Tuple
 
-
-from dateutil import parser
-import requests
-from requests import Response
 import mercantile
-import rasterio as rio
-from rasterio.merge import merge
 import numpy as np
-from shapely.geometry import box
+import rasterio as rio
+import requests
 import xmltodict
+from dateutil import parser
+from rasterio.merge import merge
+from requests import Response
+from shapely.geometry import box
 
 from blockutils.logging import get_logger
 from blockutils.stac import STACQuery
@@ -285,6 +284,7 @@ class GibsAPI:
         tiles: list,
         date: str,
         output_uuid: str,
+        tilesize: int = 256,
     ) -> Path:
         """
         Fetches all tiles for one date, merges them and returns a GeoTIFF
@@ -312,7 +312,16 @@ class GibsAPI:
 
         out_all = np.concatenate([imagery_layers[k]["out_ar"] for k in imagery_layers])
 
-        out_all_shape = tuple(out_all.shape)
+        _merged_shape: List = list(out_all.shape)
+        while _merged_shape[1] % tilesize != 0:
+            # X dimension not divisible by tile_size
+            _merged_shape[1] -= 1
+            # Remove one pixel
+        while _merged_shape[2] % tilesize != 0:
+            # Y dimension not divisible by tile_size
+            _merged_shape[2] -= 1
+
+        out_all_shape = tuple(_merged_shape)
 
         merged_img_meta = img_files[0].meta.copy()
         merged_img_meta.update(
@@ -331,6 +340,6 @@ class GibsAPI:
         with rio.open(img_filename, "w", **merged_img_meta) as dataset:
             for band in make_list_layer_band(imagery_layers, out_all_shape[0]):
                 dataset.update_tags(band[0], layer=band[1], band=band[2])
-            dataset.write(out_all)
+            dataset.write(out_all[:, : out_all_shape[1], : out_all_shape[2]])
 
         return Path(img_filename)
