@@ -13,7 +13,7 @@ from rasterio.transform import Affine
 from PIL import Image
 
 import requests_mock as mock
-from blockutils.common import meta_is_equal
+from blockutils.geometry import meta_is_equal
 from context import (
     GibsAPI,
     extract_query_dates,
