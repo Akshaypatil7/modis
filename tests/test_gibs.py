@@ -4,6 +4,7 @@ Unit tests for all methods in the Gibs module i.e. internal logic and API intera
 
 import os
 import collections
+from datetime import datetime, timedelta
 
 import pytest
 import mercantile
@@ -118,7 +119,10 @@ def test_extract_query_dates():
     (2) limit is set to a number smaller or equal than days are in the provided time period
     (3) limit is set to a number larger than days are in the provided time period
     (4) time is set to one point in time (not a period)
+    (5) time is set to a period ending in the future
     """
+    yesterday = (datetime.utcnow()-timedelta(days=1)).strftime('%Y-%m-%d')
+    day_before_yesterday = (datetime.utcnow() - timedelta(days=2)).strftime('%Y-%m-%d')
 
     # case (1)
     query = STACQuery.from_dict(
@@ -137,8 +141,7 @@ def test_extract_query_dates():
     date_list = extract_query_dates(query)
     assert len(date_list) == 2
     assert date_list[0] < date_list[1]
-    for date in date_list:
-        assert date.startswith("20")
+    assert date_list == [day_before_yesterday, yesterday]
 
     # case (2)
     query = STACQuery.from_dict(
@@ -193,6 +196,24 @@ def test_extract_query_dates():
 
     date_list = extract_query_dates(query)
     assert date_list == ["2019-04-25"]
+
+    # case (5)
+    query = STACQuery.from_dict(
+        {
+            "zoom_level": 9,
+            "time": "2019-04-20T16:40:49+00:00/2029-04-25T17:45:49+00:00",
+            "limit": 2,
+            "bbox": [
+                114.11227717995645,
+                -21.861101064554884,
+                114.20209027826787,
+                -21.764821237030162,
+            ],
+        }
+    )
+
+    date_list = extract_query_dates(query)
+    assert date_list == [day_before_yesterday, yesterday]
 
 
 def test_make_list_layer_band():
