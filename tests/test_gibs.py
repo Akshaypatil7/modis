@@ -12,11 +12,13 @@ import rasterio as rio
 from rasterio.crs import CRS
 from rasterio.transform import Affine
 from PIL import Image
+import pytz
 
 import requests_mock as mock
 from blockutils.geometry import meta_is_equal
 from context import (
     GibsAPI,
+    move_dates_to_past,
     extract_query_dates,
     ensure_data_directories_exist,
     STACQuery,
@@ -110,6 +112,19 @@ def test_validate_imagery_layers(requests_mock):
     assert invalid[1] == [
         "POLYGON ((180 -85.051129, 180 85.051129, -180 85.051129, -180 -85.051129, 180 -85.051129))"
     ]
+
+
+def test_move_dates_to_past():
+
+    date_points = [datetime(2019, 4, 20, 16, 40, 49), datetime(2029, 4, 25, 17, 45, 49)]
+    date_points = [date_point.replace(tzinfo=pytz.UTC) for date_point in date_points]
+    updated_dates = move_dates_to_past(date_points)
+
+    yesterday = datetime.utcnow() - timedelta(days=1)
+    expected_dates = [datetime(2019, 4, 20, 16, 40, 49), yesterday]
+    expected_dates = [date_point.replace(tzinfo=pytz.UTC) for date_point in expected_dates]
+
+    assert updated_dates == expected_dates
 
 
 def test_extract_query_dates():
