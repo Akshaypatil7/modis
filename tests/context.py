@@ -14,5 +14,10 @@ from blockutils.stac import STACQuery
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
-from src.gibs import GibsAPI, extract_query_dates, make_list_layer_band
+from src.gibs import (
+    GibsAPI,
+    extract_query_dates,
+    make_list_layer_band,
+    move_dates_to_past,
+)
 from src.modis import Modis

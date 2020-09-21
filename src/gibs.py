@@ -1,7 +1,6 @@
 import collections
-import datetime
 import tempfile
-from datetime import timedelta
+from datetime import datetime, timedelta
 from io import BytesIO
 from pathlib import Path
 from typing import IO, Any, List, Tuple
@@ -12,6 +11,7 @@ import rasterio as rio
 import requests
 import xmltodict
 from dateutil import parser
+import pytz
 from rasterio.merge import merge
 from requests import Response
 from shapely.geometry import box
@@ -24,6 +24,24 @@ logger = get_logger(__name__)
 
 class WMTSException(Exception):
     pass
+
+
+def move_dates_to_past(date_points: list) -> list:
+    """
+    Moves dates to the past counting backwards from yesterday if the requested date range extends
+    into the future
+    Args:
+        date_strings -- list of dates
+
+    Returns:
+        list of dates
+    """
+    yesterday = (datetime.utcnow() - timedelta(days=1)).replace(tzinfo=pytz.UTC)
+    days_to_move = date_points[-1] - yesterday
+
+    if days_to_move > timedelta(days=0):
+        date_points = [date_points[0], date_points[1] - days_to_move]
+    return date_points
 
 
 def extract_query_dates(query: STACQuery) -> list:
@@ -40,7 +58,7 @@ def extract_query_dates(query: STACQuery) -> list:
 
     if query.time is None:
         # Return latest [limit] dates counting from yesterday backwards
-        now = datetime.datetime.now()
+        now = datetime.utcnow()
         date_list = sorted(
             [
                 (now - timedelta(days=idx + 1)).strftime("%Y-%m-%d")
@@ -48,9 +66,10 @@ def extract_query_dates(query: STACQuery) -> list:
             ]
         )
     else:
-        # time is set, first check if it is an interval or only one point in time
         date_strings = str(query.time).split("/")
+        # time is set, first check if it is an interval or only one point in time
         date_points = [parser.parse(date_str) for date_str in date_strings]
+        date_points = move_dates_to_past(date_points)
         if len(date_points) == 2:
             time_diff = date_points[1] - date_points[0]
             days_in_interval = time_diff.days + bool(time_diff.seconds)
