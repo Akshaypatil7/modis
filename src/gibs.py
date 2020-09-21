@@ -201,7 +201,7 @@ class GibsAPI:
         """
         Fetches an RGB quicklook image using WMS
         """
-        logger.debug("Will now fetch quicklook %s for date %s", bbox, date)
+        logger.debug(f"Will now fetch quicklook {bbox} for date {date}")
 
         width_height_ratio = abs((bbox[0] - bbox[2]) / (bbox[1] - bbox[3]))
         if width_height_ratio > 1:
@@ -284,7 +284,7 @@ class GibsAPI:
         tile_transform = rio.transform.from_bounds(
             *mercantile.xy_bounds(tile),
             width=tile_meta.get("width"),
-            height=tile_meta.get("height")
+            height=tile_meta.get("height"),
         )
 
         tile_meta.update(driver="GTiff", crs="EPSG:3857", transform=tile_transform)
@@ -312,7 +312,7 @@ class GibsAPI:
         logger.info("Downloading tiles")
         for layer in imagery_layers:
             img_files = []
-            logger.info("Getting %s", layer)
+            logger.info(f"Getting {layer}")
             for tile in tiles:
                 tiff_file = self.download_wmts_tile_as_geotiff(
                     layer, date, tile, imagery_layers[layer]["Format"]
@@ -326,8 +326,8 @@ class GibsAPI:
                 "out_ar"
             ].shape
 
-            logger.info("Shape of layer is %r", imagery_layers[layer]["out_ar"].shape)
-            logger.info("Layer %s added!", layer)
+            logger.info(f"Shape of layer is {imagery_layers[layer]['out_ar'].shape}")
+            logger.info(f"Layer {layer} added!")
 
         out_all = np.concatenate([imagery_layers[k]["out_ar"] for k in imagery_layers])
 

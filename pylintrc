@@ -9,6 +9,8 @@ disable=
     missing-final-newline,
     too-many-boolean-expressions,
     bad-continuation,
+    logging-fstring-interpolation,
+    logging-format-interpolation,
     fixme
 
 [FORMAT]

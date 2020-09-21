@@ -46,17 +46,17 @@ class Modis(DataBlock):
 
         date_list = extract_query_dates(query)
 
-        logger.debug("Checking layer %r", query.imagery_layers)
+        logger.debug(f"Checking layer {query.imagery_layers}")
         are_valid, invalid, valid_imagery_layers = self.api.validate_imagery_layers(
             query.imagery_layers, query.bounds()
         )
         if are_valid:
-            logger.debug("Layers %r OK!", query.imagery_layers)
+            logger.debug(f"Layers {query.imagery_layers} OK!")
         else:
             raise UP42Error(
                 SupportedErrors.INPUT_PARAMETERS_ERROR,
-                "Invalid Layers. %r have invalid names."
-                "%r are layer bounds, search should be within this." % invalid,
+                f"Invalid Layers. {invalid} have invalid names."
+                f"{invalid} are layer bounds, search should be within this.",
             )
 
         for query_date in date_list:
@@ -95,6 +95,6 @@ class Modis(DataBlock):
         # convert the list into FeatureCollection
         output_feat_coll = FeatureCollection(list(output_features))
 
-        logger.debug("Saving %s result features", len(output_feat_coll.get("features")))
+        logger.debug(f"Saving {len(output_feat_coll.get('features'))} result features")
 
         return output_feat_coll
