@@ -121,8 +121,8 @@ def test_extract_query_dates():
     (4) time is set to one point in time (not a period)
     (5) time is set to a period ending in the future
     """
-    yesterday = (datetime.utcnow()-timedelta(days=1)).strftime('%Y-%m-%d')
-    day_before_yesterday = (datetime.utcnow() - timedelta(days=2)).strftime('%Y-%m-%d')
+    yesterday = (datetime.utcnow() - timedelta(days=1)).strftime("%Y-%m-%d")
+    day_before_yesterday = (datetime.utcnow() - timedelta(days=2)).strftime("%Y-%m-%d")
 
     # case (1)
     query = STACQuery.from_dict(
