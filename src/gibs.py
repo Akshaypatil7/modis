@@ -40,7 +40,7 @@ def move_dates_to_past(date_points: list) -> list:
     days_to_move = date_points[-1] - yesterday
 
     if days_to_move > timedelta(days=0):
-        date_points = [date_point - days_to_move for date_point in date_points]
+        date_points = [date_points[0], date_points[1] - days_to_move]
     return date_points
 
 

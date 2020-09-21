@@ -120,11 +120,12 @@ def test_move_dates_to_past():
     date_points = [date_point.replace(tzinfo=pytz.UTC) for date_point in date_points]
     updated_dates = move_dates_to_past(date_points)
 
-    yesterday = datetime.utcnow() - timedelta(days=1)
-    expected_dates = [datetime(2019, 4, 20, 16, 40, 49), yesterday]
-    expected_dates = [date_point.replace(tzinfo=pytz.UTC) for date_point in expected_dates]
+    yesterday = (datetime.utcnow() - timedelta(days=1)).replace(tzinfo=pytz.UTC)
+    expected_dates = [date_points[0], yesterday]
+    updated_dates_str = [date.strftime("%Y-%m-%d") for date in updated_dates]
+    expected_dates_str = [date.strftime("%Y-%m-%d") for date in expected_dates]
 
-    assert updated_dates == expected_dates
+    assert updated_dates_str == expected_dates_str
 
 
 def test_extract_query_dates():
