@@ -1,10 +1,13 @@
 import uuid
 from typing import List
+from pathlib import Path
+from collections import OrderedDict
 
 import mercantile
+from mercantile import Tile
+from mercantile import MercantileError
 import requests
 from geojson import Feature, FeatureCollection
-from mercantile import MercantileError
 from shapely.geometry import box
 from shapely.ops import unary_union
 
@@ -13,6 +16,8 @@ from blockutils.exceptions import SupportedErrors, UP42Error
 from blockutils.geometry import filter_tiles_intersect_with_geometry
 from blockutils.logging import get_logger
 from blockutils.stac import STACQuery
+from blockutils.wmts import MultiTileMergeHelper
+from blockutils.datapath import set_data_path
 
 from gibs import GibsAPI, extract_query_dates
 
@@ -24,6 +29,40 @@ class Modis(DataBlock):
     def __init__(self, default_zoom_level: int = DEFAULT_ZOOM_LEVEL):
         self.api = GibsAPI()
         self.default_zoom_level = default_zoom_level
+
+    def get_final_merged_image(
+        self,
+        tile_list: List[Tile],
+        valid_imagery_layers: OrderedDict,
+        query_date: list,
+        feature_id: str,
+    ):
+        img_filename = Path("/tmp/output/%s.tif" % str(feature_id))
+        req_kwargs_list = []
+        for layer in valid_imagery_layers:
+            req_kwargs_list.append(
+                {
+                    "req_kwargs": {
+                        "layer": layer,
+                        "date": query_date,
+                        "img_format": valid_imagery_layers[layer]["Format"],
+                    },
+                    "crs": "EPSG:3857",
+                }
+            )
+
+        logger.info("Fetching tiles")
+        valid_tiles = MultiTileMergeHelper.from_req_kwargs(
+            tile_list,
+            req=self.api.requests_wmts_tile,
+            kwargs_list=req_kwargs_list,
+        ).get_multiband_tif(img_filename, return_cog=False)
+
+        logger.info(
+            f"There are {len(valid_tiles[0])} valid data tiles out of {len(tile_list)}"
+        )
+
+        return img_filename
 
     def fetch(self, query: STACQuery, dry_run: bool = False) -> FeatureCollection:
 
@@ -39,8 +78,8 @@ class Modis(DataBlock):
                     geometry=query.geometry(),
                 )
             )
-        except MercantileError:
-            raise UP42Error(SupportedErrors.INPUT_PARAMETERS_ERROR)
+        except MercantileError as mercerr:
+            raise UP42Error(SupportedErrors.INPUT_PARAMETERS_ERROR) from mercerr
 
         output_features: List[Feature] = []
 
@@ -60,6 +99,7 @@ class Modis(DataBlock):
             )
 
         for query_date in date_list:
+            self.api.get_layer_bands_count(tile_list, valid_imagery_layers, query_date)
             for layer in valid_imagery_layers:
                 feature_id: str = str(uuid.uuid4())
                 return_poly = unary_union(
@@ -78,23 +118,15 @@ class Modis(DataBlock):
 
             if not dry_run:
                 # Fetch tiles and patch them together
-                try:
-                    self.api.get_merged_image(
-                        valid_imagery_layers, tile_list, query_date, feature_id
-                    )
-                    feature["properties"]["up42.data_path"] = "%s.tif" % feature_id
-                except requests.exceptions.HTTPError:
-                    raise UP42Error(
-                        SupportedErrors.API_CONNECTION_ERROR,
-                        message="Failed to get merged Image",
-                    )
+                img_filename = self.get_final_merged_image(
+                    tile_list, valid_imagery_layers, query_date, feature_id
+                )
+                self.api.post_process(img_filename, valid_imagery_layers)
+                set_data_path(feature, f"{feature_id}.tif")
 
             logger.debug(feature)
             output_features.append(feature)
 
-        # convert the list into FeatureCollection
-        output_feat_coll = FeatureCollection(list(output_features))
+        logger.debug(f"Saving {len(output_features)} result features")
 
-        logger.debug(f"Saving {len(output_feat_coll.get('features'))} result features")
-
-        return output_feat_coll
+        return FeatureCollection(list(output_features))

@@ -8,10 +8,9 @@ import re
 
 import rasterio as rio
 import numpy as np
-import requests_mock as mock
 import pytest
 
-from blockutils.exceptions import UP42Error, SupportedErrors
+from blockutils.exceptions import UP42Error
 
 from context import STACQuery, Modis
 
@@ -178,6 +177,9 @@ def test_aoiclipped_fetcher_fetch(requests_mock, modis_instance):
     with rio.open(img_filename) as dataset:
         band2 = dataset.read(2)
         assert np.sum(band2) == 7954025
+        assert dataset.tags(1)["layer"] == "MODIS_Terra_CorrectedReflectance_TrueColor"
+        assert dataset.tags(1)["band"] == str(1)
+        assert dataset.tags(2)["band"] == str(2)
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]["id"])
 
 

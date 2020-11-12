@@ -8,14 +8,10 @@ from datetime import datetime, timedelta
 
 import pytest
 import mercantile
-import rasterio as rio
-from rasterio.crs import CRS
-from rasterio.transform import Affine
 from PIL import Image
 import pytz
 
 import requests_mock as mock
-from blockutils.geometry import meta_is_equal
 from context import (
     GibsAPI,
     move_dates_to_past,
@@ -239,17 +235,20 @@ def test_make_list_layer_band():
                 "Identifier": "MODIS_Terra_CorrectedReflectance_TrueColor",
                 "Format": "jpeg",
                 "out_ar_shape": (3, 5, 5),
+                "bands_count": 3,
             },
             "MODIS_Aqua_CorrectedReflectance_TrueColor": {
                 "Identifier": "MODIS_Aqua_CorrectedReflectance_TrueColor",
                 "Format": "jpeg",
                 "out_ar_shape": (3, 5, 5),
+                "bands_count": 3,
             },
         }
     )
 
     test_count = 6
     list_imagery_layers = make_list_layer_band(test_imagery_layers, test_count)
+
     assert len(list_imagery_layers) == 6
     assert list_imagery_layers[0] == [
         1,
@@ -264,7 +263,7 @@ def test_make_list_layer_band():
     assert list_imagery_layers[3] == [4, "MODIS_Aqua_CorrectedReflectance_TrueColor", 1]
 
 
-def test_download_wmts_tile_as_geotiff(requests_mock):
+def test_requests_wmts_tile(requests_mock):
     """
     Mocked test for tile download
     """
@@ -278,120 +277,9 @@ def test_download_wmts_tile_as_geotiff(requests_mock):
 
     requests_mock.get(mock.ANY, content=fake_tile)
 
-    result = GibsAPI().download_wmts_tile_as_geotiff(test_layer, test_date, test_tile)
+    result = GibsAPI().requests_wmts_tile(test_tile, test_layer, test_date)
 
-    expected_meta = {
-        "driver": "GTiff",
-        "dtype": "uint8",
-        "nodata": None,
-        "width": 256,
-        "height": 256,
-        "count": 3,
-        "crs": CRS.from_dict(init="epsg:3857"),
-    }
-
-    with rio.open(result) as dataset:
-        meta = dataset.meta
-        meta.pop("transform")
-        assert meta == expected_meta
-
-
-@pytest.mark.live
-def test_get_merged_image():
-    """
-    Unmocked ("live") test making sure output images have correct metadata set
-    """
-    test_tiles = [
-        mercantile.Tile(x=290, y=300, z=9),
-        mercantile.Tile(x=290, y=301, z=9),
-    ]
-
-    test_date = "2019-06-20"
-    test_layer = {
-        "MODIS_Terra_CorrectedReflectance_TrueColor": {
-            "Identifier": "MODIS_Terra_CorrectedReflectance_TrueColor",
-            "TileMatrixSet": "GoogleMapsCompatible_Level9",
-            "WGS84BoundingBox": "shapely.geometry.polygon.Polygon object at 0x130e71590",
-            "Format": "jpeg",
-        }
-    }
-
-    result_filename = GibsAPI().get_merged_image(
-        test_layer, test_tiles, test_date, "a8ebbe34-4d63-4eef-8ff4-c69da3ee359d"
-    )
-
-    expected_meta = {
-        "driver": "GTiff",
-        "dtype": "uint8",
-        "nodata": None,
-        "width": 256,
-        "height": 512,
-        "count": 3,
-        "crs": CRS.from_dict(init="epsg:3857"),
-        "transform": Affine(
-            305.74811314070394,
-            0.0,
-            2661231.5767766964,
-            0.0,
-            -305.7481131407094,
-            -3443946.746416901,
-        ),
-    }
-
-    with rio.open(str(result_filename)) as dataset:
-        assert meta_is_equal(dataset.meta, expected_meta)
-
-
-@pytest.mark.live
-def test_get_multiple_merged_image():
-    """
-    Unmocked ("live") test with multiple imagery_layers making sure output images have
-    correct metadata set
-    """
-    test_tiles = [
-        mercantile.Tile(x=290, y=300, z=9),
-        mercantile.Tile(x=290, y=301, z=9),
-    ]
-
-    test_date = "2019-06-20"
-    test_imagery_layers = {
-        "MODIS_Terra_CorrectedReflectance_TrueColor": {
-            "Identifier": "MODIS_Terra_CorrectedReflectance_TrueColor",
-            "Format": "jpeg",
-        },
-        "MODIS_Aqua_CorrectedReflectance_TrueColor": {
-            "Identifier": "MODIS_Aqua_CorrectedReflectance_TrueColor",
-            "Format": "jpeg",
-        },
-    }
-
-    result_filename = GibsAPI().get_merged_image(
-        test_imagery_layers,
-        test_tiles,
-        test_date,
-        "a8ebbe34-4d63-4eef-8ff4-c69da3ee359d",
-    )
-
-    expected_meta = {
-        "driver": "GTiff",
-        "dtype": "uint8",
-        "nodata": None,
-        "width": 256,
-        "height": 512,
-        "count": 6,
-        "crs": CRS.from_dict(init="epsg:3857"),
-        "transform": Affine(
-            305.74811314070394,
-            0.0,
-            2661231.5767766964,
-            0.0,
-            -305.7481131407094,
-            -3443946.746416901,
-        ),
-    }
-
-    with rio.open(str(result_filename)) as dataset:
-        assert meta_is_equal(dataset.meta, expected_meta, atol=1e-02)
+    assert result.content is not None
 
 
 @pytest.mark.live
@@ -411,3 +299,31 @@ def test_write_quicklook():
     image = Image.open(str(quicklook_path))
     assert image.size == (512, 477)
     assert image.mode == "RGB"
+
+
+def test_get_layer_bands_count(requests_mock):
+    """
+    Mocked test for tile download
+    """
+    _location_ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    test_tile_list = [mercantile.Tile(x=290, y=300, z=9)]
+    test_date = "2019-06-20"
+    test_imagery_layers = collections.OrderedDict(
+        {
+            "MODIS_Terra_CorrectedReflectance_TrueColor": {
+                "Identifier": "MODIS_Terra_CorrectedReflectance_TrueColor",
+                "Format": "jpeg",
+                "out_ar_shape": (3, 5, 5),
+            }
+        }
+    )
+
+    with open(os.path.join(_location_, "mock_data/tile.jpg"), "rb") as tile_file:
+        fake_tile: object = tile_file.read()
+
+    requests_mock.get(mock.ANY, content=fake_tile)
+    GibsAPI().get_layer_bands_count(test_tile_list, test_imagery_layers, test_date)
+    assert (
+        test_imagery_layers["MODIS_Terra_CorrectedReflectance_TrueColor"]["bands_count"]
+        == 3
+    )
