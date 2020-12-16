@@ -15,7 +15,7 @@
       "bbox": {"type": "array", "default": null},
       "intersects": {"type": "geometry"},
       "contains": {"type": "geometry"},
-      "time": {"type": "dateRange", "default": null},
+      "time": {"type": "dateRange", "default": "2018-12-01T00:00:00+00:00/2020-12-31T23:59:59+00:00"},
       "limit": {"type": "integer", "minimum": 1, "default": 1},
       "zoom_level": {"type": "integer", "minimum": 9, "maximum": 9, "default": 9},
       "imagery_layers": {"type": "array", "default": ["MODIS_Terra_CorrectedReflectance_TrueColor"]}

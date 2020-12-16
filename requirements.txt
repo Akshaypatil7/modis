@@ -4,6 +4,7 @@ shapely
 mercantile
 ciso8601
 python-dateutil
+pytz
 pytest
 pytest-mypy
 pytest-cov
