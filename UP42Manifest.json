@@ -9,7 +9,7 @@
       "optical",
       "global"
     ],
-    "display_name": "MODIS AOI-Clipped",
+    "display_name": "MODIS (GeoTIFF)",
     "description": "MODIS optical data with daily revisit rate fetched using Global Imagery Browse Services (GIBS).",
     "parameters": {
       "bbox": {"type": "array", "default": null},
