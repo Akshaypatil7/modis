@@ -288,21 +288,21 @@ def test_requests_wmts_tile(requests_mock):
 
 @patch("requests.get")
 @pytest.mark.parametrize(
-    "exp_error",
+    "expected_error",
     [requests.exceptions.ConnectionError(), requests.exceptions.HTTPError()],
 )
-def test_requests_wmts_tile_raises(get_mock, exp_error):
+def test_requests_wmts_tile_raises(get_mock, expected_error):
     """
     Mocked test for raising connection
     """
     # _location_ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     test_tile = mercantile.Tile(x=290, y=300, z=9)
     test_date = "2019-06-20"
-    test_layer = "MODIS_Terra_CorrectedReflectance_TrueColor"
+    test_layer = "fake-layer"
 
-    get_mock.side_effect = exp_error
+    get_mock.side_effect = expected_error
 
-    with pytest.raises(UP42Error):
+    with pytest.raises(UP42Error, match=r".*['API_CONNECTION_ERROR'].*"):
         GibsAPI().requests_wmts_tile(test_tile, test_layer, test_date)
 
 
