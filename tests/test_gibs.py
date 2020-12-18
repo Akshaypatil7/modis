@@ -293,7 +293,7 @@ def test_requests_wmts_tile(requests_mock):
 )
 def test_requests_wmts_tile_raises(get_mock, expected_error):
     """
-    Mocked test for raising connection
+    Mocked test for raising connection and HTTP error
     """
     test_tile = mercantile.Tile(x=290, y=300, z=9)
     test_date = "2019-06-20"
