@@ -1,17 +1,18 @@
 import collections
 from datetime import datetime, timedelta
-from typing import List, Tuple
 from io import BytesIO
+from typing import List, Tuple
 
 import mercantile
+import pytz
 import rasterio as rio
 import requests
 import xmltodict
 from dateutil import parser
-import pytz
 from requests import Response
 from shapely.geometry import box
 
+from blockutils.exceptions import SupportedErrors, UP42Error
 from blockutils.logging import get_logger
 from blockutils.stac import STACQuery
 
@@ -264,10 +265,18 @@ class GibsAPI:
 
         logger.debug(tile_url)
 
-        wmts_response = requests.get(tile_url)
-
-        if wmts_response.status_code != 200:
-            raise requests.RequestException
+        try:
+            wmts_response = requests.get(tile_url)
+            logger.info(f"response returned: {wmts_response.status_code}")
+            wmts_response.raise_for_status()
+        except requests.exceptions.ConnectionError as conn_err:
+            logger.error("Network related error occured")
+            raise UP42Error(
+                SupportedErrors.API_CONNECTION_ERROR, str(conn_err)
+            ) from conn_err
+        except requests.exceptions.HTTPError as err:
+            logger.error("HTTP error occured")
+            raise UP42Error(SupportedErrors.API_CONNECTION_ERROR, str(err)) from err
 
         return wmts_response
 

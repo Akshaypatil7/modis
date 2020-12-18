@@ -2,24 +2,28 @@
 Unit tests for all methods in the Gibs module i.e. internal logic and API interaction
 """
 
-import os
 import collections
+import os
 from datetime import datetime, timedelta
+from unittest.mock import patch
 
-import pytest
 import mercantile
-from PIL import Image
+import pytest
+import requests
 import pytz
-
 import requests_mock as mock
+from PIL import Image
+
 from context import (
     GibsAPI,
-    move_dates_to_past,
-    extract_query_dates,
-    ensure_data_directories_exist,
     STACQuery,
+    ensure_data_directories_exist,
+    extract_query_dates,
     make_list_layer_band,
+    move_dates_to_past,
 )
+
+from blockutils.exceptions import UP42Error
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -280,6 +284,25 @@ def test_requests_wmts_tile(requests_mock):
     result = GibsAPI().requests_wmts_tile(test_tile, test_layer, test_date)
 
     assert result.content is not None
+
+
+@patch("requests.get")
+@pytest.mark.parametrize(
+    "expected_error",
+    [requests.exceptions.ConnectionError(), requests.exceptions.HTTPError()],
+)
+def test_requests_wmts_tile_raises(get_mock, expected_error):
+    """
+    Mocked test for raising connection and HTTP error
+    """
+    test_tile = mercantile.Tile(x=290, y=300, z=9)
+    test_date = "2019-06-20"
+    test_layer = "fake-layer"
+
+    get_mock.side_effect = expected_error
+
+    with pytest.raises(UP42Error, match=r".*['API_CONNECTION_ERROR'].*"):
+        GibsAPI().requests_wmts_tile(test_tile, test_layer, test_date)
 
 
 @pytest.mark.live
