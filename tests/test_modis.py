@@ -10,9 +10,9 @@ import rasterio as rio
 import numpy as np
 import pytest
 
-from blockutils.exceptions import UP42Error
-
 from context import STACQuery, Modis
+
+from blockutils.exceptions import UP42Error
 
 
 @pytest.fixture()
