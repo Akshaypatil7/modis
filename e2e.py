@@ -4,35 +4,39 @@ is valid.
 """
 
 from pathlib import Path
-import os
 
 import geojson
 import rasterio as rio
+from blockutils.e2e import E2ETest
+
+# Disable unused params for assert
+# pylint: disable=unused-argument
+def asserts(input_dir: Path, output_dir: Path, quicklook_dir: Path, logger):
+    geojson_path = output_dir / "data.json"
+
+    with open(str(geojson_path)) as f:
+        feature_collection = geojson.load(f)
+
+    img_filename = (
+        output_dir / feature_collection.features[0]["properties"]["up42.data_path"]
+    )
+    with rio.open(img_filename) as dataset:
+        meta = dataset.meta
+        assert meta["width"] == 256
+        assert meta["height"] == 256
+        assert meta["count"] == 4
+
 
 if __name__ == "__main__":
-    OUTPUT_DIR = Path("/tmp/e2e_modis")
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    FILES_TO_DELETE = Path(OUTPUT_DIR / "output").glob("*.*")
-    for file_path in FILES_TO_DELETE:
-        file_path.unlink()
-
-    RUN_CMD = """docker run -v /tmp/e2e_modis:/tmp \
-                 -e 'UP42_TASK_PARAMETERS={"bbox":[18.433567,-33.917003,18.439345,-33.912106],\
-                 "imagery_layers": ["MODIS_Terra_CorrectedReflectance_TrueColor", "MODIS_Terra_NDVI_8Day"]}' \
-                 -it nasa-modis"""
-    os.system(RUN_CMD)
-
-    GEOJSON_PATH = OUTPUT_DIR / "output" / "data.json"
-
-    with open(str(GEOJSON_PATH)) as f:
-        FEATURE_COLLECTION = geojson.load(f)
-
-    IMG_FILENAME = "%s/%s" % (
-        str(OUTPUT_DIR / "output"),
-        FEATURE_COLLECTION.features[0]["properties"]["up42.data_path"],
+    e2e = E2ETest("nasa-modis")
+    e2e.add_parameters(
+        {
+            "bbox": [18.433567, -33.917003, 18.439345, -33.912106],
+            "imagery_layers": [
+                "MODIS_Terra_CorrectedReflectance_TrueColor",
+                "MODIS_Terra_NDVI_8Day",
+            ],
+        }
     )
-    with rio.open(IMG_FILENAME) as dataset:
-        META = dataset.meta
-        assert META["width"] == 256
-        assert META["height"] == 256
-        assert META["count"] == 4
+    e2e.asserts = asserts
+    e2e.run()
