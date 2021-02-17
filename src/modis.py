@@ -7,6 +7,7 @@ import mercantile
 from mercantile import Tile
 from mercantile import MercantileError
 import requests
+from rasterio.enums import ColorInterp
 from geojson import Feature, FeatureCollection
 from shapely.geometry import box
 from shapely.ops import unary_union
@@ -18,6 +19,8 @@ from blockutils.logging import get_logger
 from blockutils.stac import STACQuery
 from blockutils.wmts import MultiTileMergeHelper
 from blockutils.datapath import set_data_path
+
+from blockutils.raster import to_cog
 
 from gibs import GibsAPI, extract_query_dates
 
@@ -122,6 +125,7 @@ class Modis(DataBlock):
                     tile_list, valid_imagery_layers, query_date, feature_id
                 )
                 self.api.post_process(img_filename, valid_imagery_layers)
+                to_cog(img_filename)
                 set_data_path(feature, f"{feature_id}.tif")
 
             logger.debug(feature)

@@ -9,6 +9,7 @@ import re
 import rasterio as rio
 import numpy as np
 import pytest
+from rio_cogeo.cogeo import cog_validate
 
 from context import STACQuery, Modis
 
@@ -348,6 +349,7 @@ def test_aoiclipped_fetcher_virs_fetch_live(modis_instance):
     with rio.open(img_filename) as dataset:
         band1 = dataset.read(1)
         assert np.sum(band1) == 45232508
+        # np.sum(dataset.read(1))
         assert dataset.count == 1
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]["id"])
 
@@ -429,6 +431,7 @@ def test_aoiclipped_fetcher_multiple_fetch_live(modis_instance):
         assert np.sum(band2) == 28351388
         assert dataset.count == 6
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]["id"])
+    assert cog_validate(img_filename)[0] is True
 
 
 @pytest.mark.live
