@@ -7,7 +7,6 @@ import mercantile
 from mercantile import Tile
 from mercantile import MercantileError
 import requests
-from rasterio.enums import ColorInterp
 from geojson import Feature, FeatureCollection
 from shapely.geometry import box
 from shapely.ops import unary_union
@@ -125,7 +124,7 @@ class Modis(DataBlock):
                     tile_list, valid_imagery_layers, query_date, feature_id
                 )
                 self.api.post_process(img_filename, valid_imagery_layers)
-                to_cog(img_filename)
+                to_cog(img_filename, forward_band_tags=True)
                 set_data_path(feature, f"{feature_id}.tif")
 
             logger.debug(feature)

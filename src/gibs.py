@@ -287,17 +287,12 @@ class GibsAPI:
             img_bands_count = dst.count
             for band in make_list_layer_band(imagery_layers, img_bands_count):
                 dst.update_tags(band[0], layer=band[1], band=band[2])
-            color_interp = [
-                ColorInterp.red,
-                ColorInterp.green,
-                ColorInterp.blue
-            ]
+            color_interp = [ColorInterp.red, ColorInterp.green, ColorInterp.blue]
             if img_bands_count > 3:
-                for i in range(img_bands_count-3):
+                for _ in range(img_bands_count - 3):
                     color_interp.append(ColorInterp.undefined)
 
             dst.colorinterp = color_interp[:img_bands_count]
-
 
     def get_layer_bands_count(self, tile_list, imagery_layers, date):
         for layer in imagery_layers:

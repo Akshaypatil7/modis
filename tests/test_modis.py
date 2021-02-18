@@ -175,6 +175,7 @@ def test_aoiclipped_fetcher_fetch(requests_mock, modis_instance):
     assert len(result.features) == 1
 
     img_filename = "/tmp/output/%s" % result.features[0]["properties"]["up42.data_path"]
+    assert cog_validate(img_filename)[0] is True
     with rio.open(img_filename) as dataset:
         band2 = dataset.read(2)
         assert np.sum(band2) == 7954025
@@ -349,9 +350,9 @@ def test_aoiclipped_fetcher_virs_fetch_live(modis_instance):
     with rio.open(img_filename) as dataset:
         band1 = dataset.read(1)
         assert np.sum(band1) == 45232508
-        # np.sum(dataset.read(1))
         assert dataset.count == 1
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]["id"])
+    assert cog_validate(img_filename)[0] is True
 
 
 @pytest.mark.live
@@ -480,3 +481,36 @@ def test_aoiclipped_fetcher_geom_error_fetch_live(modis_instance):
 
     with pytest.raises(UP42Error):
         modis_instance.fetch(query, dry_run=False)
+
+
+@pytest.mark.live
+def test_aoiclipped_fetcher_layers_cog(modis_instance):
+    """
+    Unmocked ("live") test for fetching data, error in geometry of layer
+    """
+
+    query = STACQuery.from_dict(
+        {
+            "zoom_level": 9,
+            "time": "2019-01-01T16:40:49+00:00/2021-02-15T23:59:59+00:00",
+            "limit": 1,
+            "bbox": [
+                38.941807150840766,
+                21.288749561718983,
+                39.686130881309516,
+                21.808610762909364,
+            ],
+            "imagery_layers": [
+                "MODIS_Terra_CorrectedReflectance_TrueColor",
+                "MODIS_Terra_EVI_8Day",
+                "MODIS_Terra_CorrectedReflectance_Bands721",
+            ],
+        }
+    )
+
+    result = modis_instance.fetch(query, dry_run=False)
+    assert len(result.features) == 1
+    img_filename = "/tmp/output/%s" % result.features[0]["properties"]["up42.data_path"]
+    with rio.open(img_filename) as dataset:
+        assert dataset.count == 7
+    assert cog_validate(img_filename)[0] is True
