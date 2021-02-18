@@ -175,7 +175,7 @@ def test_aoiclipped_fetcher_fetch(requests_mock, modis_instance):
     assert len(result.features) == 1
 
     img_filename = "/tmp/output/%s" % result.features[0]["properties"]["up42.data_path"]
-    assert cog_validate(img_filename)[0] is True
+    assert cog_validate(img_filename)[0]
     with rio.open(img_filename) as dataset:
         band2 = dataset.read(2)
         assert np.sum(band2) == 7954025
@@ -352,7 +352,7 @@ def test_aoiclipped_fetcher_virs_fetch_live(modis_instance):
         assert np.sum(band1) == 45232508
         assert dataset.count == 1
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]["id"])
-    assert cog_validate(img_filename)[0] is True
+    assert cog_validate(img_filename)[0]
 
 
 @pytest.mark.live
@@ -432,7 +432,7 @@ def test_aoiclipped_fetcher_multiple_fetch_live(modis_instance):
         assert np.sum(band2) == 28351388
         assert dataset.count == 6
     assert os.path.isfile("/tmp/quicklooks/%s.jpg" % result.features[0]["id"])
-    assert cog_validate(img_filename)[0] is True
+    assert cog_validate(img_filename)[0]
 
 
 @pytest.mark.live
@@ -515,4 +515,4 @@ def test_aoiclipped_fetcher_layers_cog(modis_instance):
         band2 = dataset.read(2)
         assert np.sum(band2) == 28202042
         assert dataset.count == 7
-    assert cog_validate(img_filename)[0] is True
+    assert cog_validate(img_filename)[0]
