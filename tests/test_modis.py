@@ -486,7 +486,7 @@ def test_aoiclipped_fetcher_geom_error_fetch_live(modis_instance):
 @pytest.mark.live
 def test_aoiclipped_fetcher_layers_cog(modis_instance):
     """
-    Unmocked ("live") test for fetching data, error in geometry of layer
+    Unmocked ("live") test for fetching data. Tests cog conversion with image, with 7 bands.
     """
 
     query = STACQuery.from_dict(
@@ -512,5 +512,7 @@ def test_aoiclipped_fetcher_layers_cog(modis_instance):
     assert len(result.features) == 1
     img_filename = "/tmp/output/%s" % result.features[0]["properties"]["up42.data_path"]
     with rio.open(img_filename) as dataset:
+        band2 = dataset.read(2)
+        assert np.sum(band2) == 28202042
         assert dataset.count == 7
     assert cog_validate(img_filename)[0] is True

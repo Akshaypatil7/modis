@@ -287,6 +287,8 @@ class GibsAPI:
             img_bands_count = dst.count
             for band in make_list_layer_band(imagery_layers, img_bands_count):
                 dst.update_tags(band[0], layer=band[1], band=band[2])
+            # The COG conversion assumes last band is an alpha band therefore It's necessary to define the ColorInterp
+            # property
             color_interp = [ColorInterp.red, ColorInterp.green, ColorInterp.blue]
             if img_bands_count > 3:
                 for _ in range(img_bands_count - 3):
