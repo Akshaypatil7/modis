@@ -36,6 +36,7 @@ if __name__ == "__main__":
                 "MODIS_Terra_CorrectedReflectance_TrueColor",
                 "MODIS_Terra_NDVI_8Day",
             ],
+            "time": "2018-01-01T00:00:00+00:00/2018-01-01T23:59:59+00:00"
         }
     )
     e2e.asserts = asserts
