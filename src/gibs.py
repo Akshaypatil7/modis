@@ -11,6 +11,7 @@ import xmltodict
 from dateutil import parser
 from requests import Response
 from shapely.geometry import box
+from rasterio.enums import ColorInterp
 
 from blockutils.exceptions import SupportedErrors, UP42Error
 from blockutils.logging import get_logger
@@ -286,6 +287,14 @@ class GibsAPI:
             img_bands_count = dst.count
             for band in make_list_layer_band(imagery_layers, img_bands_count):
                 dst.update_tags(band[0], layer=band[1], band=band[2])
+            # The COG conversion assumes last band is an alpha band therefore It's necessary to define the ColorInterp
+            # property
+            color_interp = [ColorInterp.red, ColorInterp.green, ColorInterp.blue]
+            if img_bands_count > 3:
+                for _ in range(img_bands_count - 3):
+                    color_interp.append(ColorInterp.undefined)
+
+            dst.colorinterp = color_interp[:img_bands_count]
 
     def get_layer_bands_count(self, tile_list, imagery_layers, date):
         for layer in imagery_layers:

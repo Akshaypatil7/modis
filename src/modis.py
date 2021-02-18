@@ -19,6 +19,8 @@ from blockutils.stac import STACQuery
 from blockutils.wmts import MultiTileMergeHelper
 from blockutils.datapath import set_data_path
 
+from blockutils.raster import to_cog
+
 from gibs import GibsAPI, extract_query_dates
 
 logger = get_logger(__name__)
@@ -122,6 +124,7 @@ class Modis(DataBlock):
                     tile_list, valid_imagery_layers, query_date, feature_id
                 )
                 self.api.post_process(img_filename, valid_imagery_layers)
+                to_cog(img_filename, forward_band_tags=True)
                 set_data_path(feature, f"{feature_id}.tif")
 
             logger.debug(feature)
