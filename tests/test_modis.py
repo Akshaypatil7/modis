@@ -128,6 +128,40 @@ def test_aoiclipped_fetcher_geom_error_fetch_in_dry_run_mode(modis_instance):
         modis_instance.fetch(query, dry_run=True)
 
 
+def test_aoiclipped_dry_run_only_bbox(requests_mock, modis_instance):
+    """
+    Mocked test for fetching data with only bbox param
+    """
+    _location_ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+    with open(
+        os.path.join(_location_, "mock_data/available_imagery_layers.xml"), "rb"
+    ) as xml_file:
+        mock_xml: object = xml_file.read()
+    with open(os.path.join(_location_, "mock_data/tile.jpg"), "rb") as tile_file:
+        mock_image: object = tile_file.read()
+
+    matcher_get_capabilities = re.compile("WMTSCapabilities.xml")
+
+    matcher_wms = re.compile(
+        "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?"
+    )
+    matcher_wmts = re.compile(
+        "https://gibs.earthdata.nasa.gov/wmts/epsg3857/"
+        "best/MODIS_Terra_CorrectedReflectance_TrueColor/"
+    )
+    matcher_get_capabilities = re.compile("WMTSCapabilities.xml")
+
+    requests_mock.get(matcher_get_capabilities, content=mock_xml)
+    requests_mock.get(matcher_wms, content=mock_image)
+    requests_mock.get(matcher_wmts, content=mock_image)
+
+    query = STACQuery.from_dict({"bbox": [76.231358, 9.909276, 76.300637, 9.971047]})
+
+    res = modis_instance.fetch(query, dry_run=True)
+    assert len(res.features) == 1
+
+
 def test_aoiclipped_fetcher_fetch(requests_mock, modis_instance):
     """
     Mocked test for fetching data - quicker than the live one and therefore valuable for testing

@@ -25,12 +25,18 @@ from gibs import GibsAPI, extract_query_dates
 
 logger = get_logger(__name__)
 DEFAULT_ZOOM_LEVEL = 9
+DEFAULT_IMAGERY_LAYER = "MODIS_Terra_CorrectedReflectance_TrueColor"
 
 
 class Modis(DataBlock):
-    def __init__(self, default_zoom_level: int = DEFAULT_ZOOM_LEVEL):
+    def __init__(
+        self,
+        default_zoom_level: int = DEFAULT_ZOOM_LEVEL,
+        default_imagery_layer: str = DEFAULT_IMAGERY_LAYER,
+    ):
         self.api = GibsAPI()
         self.default_zoom_level = default_zoom_level
+        self.default_imagery_layer = default_imagery_layer
 
     def get_final_merged_image(
         self,
@@ -69,6 +75,7 @@ class Modis(DataBlock):
     def fetch(self, query: STACQuery, dry_run: bool = False) -> FeatureCollection:
 
         query.set_param_if_not_exists("zoom_level", self.default_zoom_level)
+        query.set_param_if_not_exists("imagery_layers", [self.default_imagery_layer])
 
         # Get the list of tiles that cover the query AOI. Sorted by (y, x) in ascending order
         try:
