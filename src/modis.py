@@ -8,12 +8,10 @@ from mercantile import Tile
 from mercantile import MercantileError
 import requests
 from geojson import Feature, FeatureCollection
-from shapely.geometry import box
-from shapely.ops import unary_union
 
 from blockutils.blocks import DataBlock
 from blockutils.exceptions import SupportedErrors, UP42Error
-from blockutils.geometry import filter_tiles_intersect_with_geometry
+from blockutils.geometry import filter_tiles_intersect_with_geometry, tiles_to_geom
 from blockutils.logging import get_logger
 from blockutils.stac import STACQuery
 from blockutils.wmts import MultiTileMergeHelper
@@ -111,9 +109,8 @@ class Modis(DataBlock):
             self.api.get_layer_bands_count(tile_list, valid_imagery_layers, query_date)
             for layer in valid_imagery_layers:
                 feature_id: str = str(uuid.uuid4())
-                return_poly = unary_union(
-                    [box(*tuple(mercantile.bounds(bbox))) for bbox in tile_list]
-                )
+                return_poly = tiles_to_geom(tile_list)
+
                 feature = Feature(
                     id=feature_id, bbox=return_poly.bounds, geometry=return_poly
                 )
